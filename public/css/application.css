@@ -1,0 +1,19 @@
+input[type="text"] {
+    font-size:18pt;
+    padding: 10px;
+    border: none;
+    border-bottom: solid 2px #c9c9c9;
+    transition: border 0.3s;
+}
+
+input[type="text"]:focus {
+    outline: none;
+    border-bottom: solid 2px #969696;
+}
+
+.center {
+    margin-top: 200px;
+    width: 200px;
+    margin-left: auto;
+    margin-right: auto;
+}

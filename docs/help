@@ -1,0 +1,12 @@
+usage: make <command>
+
+== commands
+
+  console   Start an IRB session (alias: "c")
+  db-seed   Load seed data from the db/seeds.rb file
+  install   Create .env file and install dependencies
+  secret    Generate a cryptographically secure secret key
+  server    Start up the server on localhost, port 9393 (alias: "s")
+  smtp      Start up SMTP server
+  test      Run all tests in tests folder (alias: "t")
+  update    Install dependencies, includes development dependencies

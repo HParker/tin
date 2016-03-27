@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+
+    <title>Tin</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    {{! app.csrf.meta_tag }}
+
+    <link rel="stylesheet" href="/css/application.css">
+  </head>
+  <body>
+    {{! content }}
+
+    <script src="/js/application.js"></script>
+  </body>
+</html>

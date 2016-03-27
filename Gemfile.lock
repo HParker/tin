@@ -1,0 +1,67 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    clap (1.0.0)
+    cuba (3.4.0)
+      rack
+    cutest (1.2.2)
+      clap
+    envoker (1.2.0)
+    hache (1.1.0)
+    hiredis (0.6.0)
+    hmote (1.4.0)
+      hache (~> 1.1)
+    hmote-render (1.0.0)
+      hmote (~> 1.3)
+    kuvert (0.0.2)
+      mime-types (~> 2.4)
+    malone (1.2.0)
+      kuvert (~> 0.0)
+    ment (0.2.0)
+    mime-types (2.6.2)
+    mote (1.1.4)
+    msgpack (0.5.12)
+    mt (0.0.2)
+    nido (1.0.0)
+    ohm (2.3.0)
+      msgpack (~> 0.5.0)
+      nido
+      redic (~> 1.5.0)
+      stal
+    posten (0.0.3)
+      malone (~> 1.2.0)
+      mote (~> 1.1.4)
+      seteable (= 1.0.0)
+    puma (2.14.0)
+    rack (1.6.4)
+    rack-test (0.6.3)
+      rack (>= 1.0)
+    redic (1.5.0)
+      hiredis
+    scrivener (1.0.0)
+    seteable (1.0.0)
+    shotgun (0.9.1)
+      rack (>= 1.0)
+    stal (0.1.0)
+      redic
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  cuba (= 3.4.0)
+  cutest (= 1.2.2)
+  envoker (= 1.2.0)
+  hmote (= 1.4.0)
+  hmote-render (= 1.0.0)
+  ment (= 0.2.0)
+  mt (= 0.0.2)
+  ohm (= 2.3.0)
+  posten (= 0.0.3)
+  puma (= 2.14.0)
+  rack-test (= 0.6.3)
+  scrivener (= 1.0.0)
+  shotgun (= 0.9.1)
+
+BUNDLED WITH
+   1.10.6

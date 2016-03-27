@@ -1,0 +1,8 @@
+source $HOME/.screenrc
+
+screen -t vim 0 vim .
+screen -t console 1 make console
+screen -t server 2 make server
+screen -t smtp 3 make smtp
+
+select vim
