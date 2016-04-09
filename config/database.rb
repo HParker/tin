@@ -1,1 +1,1 @@
-Ohm.redis = Redic.new(Settings::REDIS_URL)
+# Ohm.redis = Redic.new(Settings::REDIS_URL)
