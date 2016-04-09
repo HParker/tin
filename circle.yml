@@ -1,2 +1,2 @@
 test:
-  override: make t
+  override: "make t"
