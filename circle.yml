@@ -11,4 +11,4 @@ deployment:
   production:
     branch: master
     heroku:
-      appname: tin
+      appname: fierce-stream-22918
