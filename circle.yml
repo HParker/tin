@@ -1,3 +1,9 @@
 test:
+  environment:
+    REDIS_URL: redis://127.0.0.1:6379/
+    SESSION_KEY: app
+    SESSION_SECRET: _change_this_with_make_secret_
+    SMTP_URL: smtp://localhost:2525
+
   override:
     - make t
