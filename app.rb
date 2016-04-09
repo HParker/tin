@@ -1,3 +1,4 @@
+require "json"
 require "bundler/setup"
 require "cuba"
 require "cuba/safe"
@@ -53,8 +54,15 @@ Cuba.define do
 
   on root do
     on param("q") do |query|
-      render("home", q: Processor.process(query))
+      response = Processor.process(query)
+      res.write(JSON.generate(response.as_json))
     end
     render("home")
+  end
+
+  on "comp" do
+    on param("pack") do |completion_pack|
+      res.write(JSON.generate(["echo"]))
+    end
   end
 end

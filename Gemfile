@@ -18,6 +18,7 @@ group :development do
 end
 
 group :test do
+  gem "riot"
   gem "cutest", "1.2.2"
   gem "rack-test", "0.6.3"
 end

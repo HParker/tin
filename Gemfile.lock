@@ -38,6 +38,9 @@ GEM
       rack (>= 1.0)
     redic (1.5.0)
       hiredis
+    riot (0.12.7)
+      rr
+    rr (1.1.2)
     scrivener (1.0.0)
     seteable (1.0.0)
     shotgun (0.9.1)
@@ -60,8 +63,9 @@ DEPENDENCIES
   posten (= 0.0.3)
   puma (= 2.14.0)
   rack-test (= 0.6.3)
+  riot
   scrivener (= 1.0.0)
   shotgun (= 0.9.1)
 
 BUNDLED WITH
-   1.10.6
+   1.11.2

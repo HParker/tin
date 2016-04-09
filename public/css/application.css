@@ -1,19 +1,55 @@
-input[type="text"] {
-    font-size:18pt;
-    padding: 10px;
-    border: none;
-    border-bottom: solid 2px #c9c9c9;
-    transition: border 0.3s;
+body {
+    font-family: 'Roboto', sans-serif;
 }
 
-input[type="text"]:focus {
+#interface {
+    font-size: 18pt;
+    padding: 10px;
+    border: none;
+    border-bottom: solid 3px #c9c9c9;
+    transition: border 0.3s;
+    height: 40px;
+    width: 330px;
+}
+
+#interface:focus {
     outline: none;
-    border-bottom: solid 2px #969696;
+    border-bottom: solid 3px #2EA6C5;
 }
 
 .center {
     margin-top: 200px;
-    width: 200px;
+    width: 350px;
     margin-left: auto;
     margin-right: auto;
+}
+
+.completions {
+    margin-top: 0px;
+    list-style: none;
+    width: 330px;
+    font-size: 14pt;
+    padding: 10px;
+    outline: 1px solid #F3F1F1;
+}
+
+.completion:hover {
+    background-color: #F3F1F1;
+}
+
+.card {
+    border-top: solid 2px #912CE2;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    padding: 10px;
+    outline: 1px solid #F3F1F1;
+    width: 330px;
+}
+
+.title {
+    margin-top: 5px;
+}
+
+.body {
+    font-size: 18pt;
 }

@@ -12,8 +12,7 @@
     <link rel="stylesheet" href="/css/application.css">
   </head>
   <body>
-    {{! content }}
-
     <script src="/js/application.js"></script>
+    {{! content }}
   </body>
 </html>

@@ -11,14 +11,13 @@ class Processor
 
   def response
     if @tokens.first == 'echo'
-      @tokens[1..-1].join
+      Message.new(action: :echo, body: @tokens[1..-1].join(' '))
     else
-      "I don't know how to respond to that"
+      Message.new(action: :unknown, body: "Sorry I don't know how to respond")
     end
   end
 
   private
-
 
   def parse(text)
     text.split(' ')
