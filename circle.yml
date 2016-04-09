@@ -1,4 +1,3 @@
-
 machine:
   environment:
     REDIS_URL: redis://127.0.0.1:6379/
@@ -8,3 +7,8 @@ machine:
 test:
   override:
     - make t
+deployment:
+  production:
+    branch: master
+    heroku:
+      appname: tin

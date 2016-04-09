@@ -10,7 +10,7 @@ class Processor
   end
 
   def response
-    if @tokens.first == 'echo'
+    if @tokens.first.downcase == 'echo'
       Message.new(action: :echo, body: @tokens[1..-1].join(' '))
     else
       Message.new(action: :unknown, body: "Sorry I don't know how to respond")
