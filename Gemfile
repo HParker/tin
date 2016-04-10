@@ -1,6 +1,6 @@
 source "https://rubygems.org"
 
-ruby "2.2.3"
+ruby "2.3.0"
 
 gem "cuba", "3.4.0"
 gem "envoker", "1.2.0"

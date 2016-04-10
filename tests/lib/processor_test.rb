@@ -2,25 +2,30 @@ require_relative '../helper'
 
 context "processor" do
   setup { Processor }
-  context "process echo" do
-    setup { topic.process("echo hello world") }
+  context "process help" do
+    setup { topic.process("help hello world") }
 
-    asserts("it returns a message") { topic.body == "hello world" }
-    asserts("knows what action it took") { topic.action == :echo }
+    asserts("it returns a message") { topic.body.match(/Hello/) }
+    asserts("knows what action it took") { topic.action == "help" }
   end
 
   context "not case sensitive" do
-    setup { topic.process("ECHO hello world") }
+    setup { topic.process("HELP hello world") }
 
-    asserts("knows what action it took") { topic.action == :echo }
+    asserts("knows what action it took") {
+      puts topic.action.inspect
+      topic.action == "help"
+    }
   end
 
   context "process unknown" do
     setup { topic.process("asdf") }
 
-    asserts("it returns the unknown action") { topic.action == :unknown }
+    asserts("it returns the unknown action") {
+      topic.action == 'help'
+    }
     asserts("it returns a message") {
-      topic.body == "Sorry I don't know how to respond"
+      topic.body.length > 0
     }
   end
 end

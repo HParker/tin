@@ -39,6 +39,7 @@ Dir["./helpers/**/*.rb"].each  { |f| require(f) }
 Dir["./mailers/**/*.rb"].each  { |f| require(f) }
 Dir["./routes/**/*.rb"].each   { |f| require(f) }
 Dir["./lib/**/*.rb"].each   { |f| require(f) }
+Dir["./plugins/**/*.rb"].each   { |f| require(f) }
 
 Cuba.plugin(ApplicationHelpers)
 
@@ -62,7 +63,7 @@ Cuba.define do
 
   on "comp" do
     on param("pack") do |completion_pack|
-      res.write(JSON.generate(["echo"]))
+      res.write(JSON.generate(Plugins::Plugin.keywords.keys))
     end
   end
 end
