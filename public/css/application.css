@@ -53,3 +53,11 @@ body {
 .body {
     font-size: 18pt;
 }
+
+b.command {
+    padding-right: 5pt;
+}
+
+i.info {
+    color: #c9c9c9;
+}

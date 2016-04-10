@@ -1,17 +1,17 @@
 class Processor
-  def self.process(text)
-    response(parse(text), text)
-  end
+  class << self
+    def process(text)
+      response(parse(text), text)
+    end
 
-  def self.response(tokens, text)
-    plugin = Plugins::Plugin.keywords[tokens.first.downcase] ||
-      Plugins::Help
-    plugin.action("")
-  end
+    private
 
-  private
+    def response(tokens, text)
+      Plugins::Plugin.obj_for(tokens.first.downcase).message(text)
+    end
 
-  def self.parse(text)
-    text.split(' ')
+    def parse(text)
+      text.split(' ')
+    end
   end
 end

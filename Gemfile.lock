@@ -6,6 +6,7 @@ GEM
       rack
     cutest (1.2.2)
       clap
+    diff-lcs (1.2.5)
     envoker (1.2.0)
     hache (1.1.0)
     hiredis (0.6.0)
@@ -38,9 +39,19 @@ GEM
       rack (>= 1.0)
     redic (1.5.0)
       hiredis
-    riot (0.12.7)
-      rr
-    rr (1.1.2)
+    rspec (3.4.0)
+      rspec-core (~> 3.4.0)
+      rspec-expectations (~> 3.4.0)
+      rspec-mocks (~> 3.4.0)
+    rspec-core (3.4.4)
+      rspec-support (~> 3.4.0)
+    rspec-expectations (3.4.0)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.4.0)
+    rspec-mocks (3.4.1)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.4.0)
+    rspec-support (3.4.1)
     scrivener (1.0.0)
     seteable (1.0.0)
     shotgun (0.9.1)
@@ -63,7 +74,7 @@ DEPENDENCIES
   posten (= 0.0.3)
   puma (= 2.14.0)
   rack-test (= 0.6.3)
-  riot
+  rspec
   scrivener (= 1.0.0)
   shotgun (= 0.9.1)
 
