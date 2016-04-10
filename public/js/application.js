@@ -11185,7 +11185,7 @@ Elm.AutoComplete.make = function (_elm) {
       _U.list([$Html.text(completion)]));
    });
    var view = F3(function (address,command,model) {
-      var visible = A2($List.filter,$String.startsWith(command),model.completions);
+      var visible = A2($List.filter,$String.startsWith($String.toLower(command)),model.completions);
       return A2($Html.ul,_U.list([$Html$Attributes.$class("completions")]),A2($List.map,show(address),visible));
    });
    var ArrowPress = function (a) {    return {ctor: "ArrowPress",_0: a};};
