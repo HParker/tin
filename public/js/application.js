@@ -11163,9 +11163,9 @@ Elm.AutoComplete.make = function (_elm) {
    $String = Elm.String.make(_elm),
    $Task = Elm.Task.make(_elm);
    var _op = {};
-   var decodeCompletion = $Json$Decode.list($Json$Decode.string);
    var moveSelection = F2(function (key,model) {    return _U.update(model,{selection: model.selection + key.y});});
-   var backupCompletions = _U.list(["one","two","three"]);
+   var backupCompletions = _U.list([]);
+   var completionMatch = F2(function (command,completion) {    return A2($String.startsWith,$String.toLower(command),completion.command);});
    var Model = F2(function (a,b) {    return {selection: a,completions: b};});
    var init = A2(Model,0,_U.list([]));
    var update = F2(function (action,model) {
@@ -11177,15 +11177,20 @@ Elm.AutoComplete.make = function (_elm) {
            return {ctor: "_Tuple2",_0: newModel,_1: $Effects.none};
          default: return {ctor: "_Tuple2",_0: model,_1: $Effects.none};}
    });
-   var Completion = function (a) {    return {command: a};};
+   var Completion = F2(function (a,b) {    return {command: a,info: b};});
+   var decodeCompletion = $Json$Decode.list(A3($Json$Decode.object2,
+   F2(function (action,info) {    return A2(Completion,action,info);}),
+   A2($Json$Decode._op[":="],"command",$Json$Decode.string),
+   A2($Json$Decode._op[":="],"info",$Json$Decode.string)));
    var Complete = function (a) {    return {ctor: "Complete",_0: a};};
    var show = F2(function (address,completion) {
       return A2($Html.li,
-      _U.list([A2($Html$Events.onClick,address,Complete(completion)),$Html$Attributes.$class("completion")]),
-      _U.list([$Html.text(completion)]));
+      _U.list([A2($Html$Events.onClick,address,Complete(completion.command)),$Html$Attributes.$class("completion")]),
+      _U.list([A2($Html.b,_U.list([$Html$Attributes.$class("command")]),_U.list([$Html.text(completion.command)]))
+              ,A2($Html.i,_U.list([$Html$Attributes.$class("info")]),_U.list([$Html.text(completion.info)]))]));
    });
    var view = F3(function (address,command,model) {
-      var visible = A2($List.filter,$String.startsWith($String.toLower(command)),model.completions);
+      var visible = A2($List.filter,completionMatch(command),model.completions);
       return A2($Html.ul,_U.list([$Html$Attributes.$class("completions")]),A2($List.map,show(address),visible));
    });
    var ArrowPress = function (a) {    return {ctor: "ArrowPress",_0: a};};
@@ -11201,6 +11206,7 @@ Elm.AutoComplete.make = function (_elm) {
                                      ,Model: Model
                                      ,init: init
                                      ,show: show
+                                     ,completionMatch: completionMatch
                                      ,view: view
                                      ,backupCompletions: backupCompletions
                                      ,moveSelection: moveSelection

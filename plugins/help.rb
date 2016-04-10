@@ -9,9 +9,9 @@ module Plugins
       Help, the message you are reading right now!
     MSG
 
-    keyword "help"
+    keyword "help", info: "show info about Tin"
 
-    def self.action(_text)
+    def self.message(_text)
       Message.new(action: "help", body: HELP_MESSAGE)
     end
   end

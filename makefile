@@ -32,7 +32,7 @@ smtp:
 	@./bin/mt 2525
 
 test:
-	@./bin/cutest -r ./tests/helper.rb ./tests/**/*_test.rb
+	@rspec
 
 update:
 	@bundle install

@@ -63,7 +63,7 @@ Cuba.define do
 
   on "comp" do
     on param("pack") do |completion_pack|
-      res.write(JSON.generate(Plugins::Plugin.keywords.keys))
+      res.write(JSON.generate(Plugins::Plugin.completions))
     end
   end
 end
