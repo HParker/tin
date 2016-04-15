@@ -11103,6 +11103,152 @@ Elm.Http.make = function (_elm) {
                              ,RawTimeout: RawTimeout
                              ,RawNetworkError: RawNetworkError};
 };
+
+// setup
+Elm.Native = Elm.Native || {};
+Elm.Native.Markdown = Elm.Native.Markdown || {};
+
+// definition
+Elm.Native.Markdown.make = function(localRuntime) {
+	'use strict';
+
+	// attempt to short-circuit
+	if ('values' in Elm.Native.Markdown)
+	{
+		return Elm.Native.Markdown.values;
+	}
+
+	var Element = Elm.Native.Graphics.Element.make(localRuntime);
+
+	var marked = (function() {
+		// catch the `marked` object regardless of the outer environment.
+		// (ex. a CommonJS module compatible environment.)
+		// note that this depends on marked's implementation of environment detection.
+		var module = {};
+		var exports = module.exports = {};
+
+		/**
+		 * marked - a markdown parser
+		 * Copyright (c) 2011-2014, Christopher Jeffrey. (MIT Licensed)
+		 * https://github.com/chjj/marked
+		 */
+		(function(){var block={newline:/^\n+/,code:/^( {4}[^\n]+\n*)+/,fences:noop,hr:/^( *[-*_]){3,} *(?:\n+|$)/,heading:/^ *(#{1,6}) *([^\n]+?) *#* *(?:\n+|$)/,nptable:noop,lheading:/^([^\n]+)\n *(=|-){2,} *(?:\n+|$)/,blockquote:/^( *>[^\n]+(\n(?!def)[^\n]+)*\n*)+/,list:/^( *)(bull) [\s\S]+?(?:hr|def|\n{2,}(?! )(?!\1bull )\n*|\s*$)/,html:/^ *(?:comment|closed|closing) *(?:\n{2,}|\s*$)/,def:/^ *\[([^\]]+)\]: *<?([^\s>]+)>?(?: +["(]([^\n]+)[")])? *(?:\n+|$)/,table:noop,paragraph:/^((?:[^\n]+\n?(?!hr|heading|lheading|blockquote|tag|def))+)\n*/,text:/^[^\n]+/};block.bullet=/(?:[*+-]|\d+\.)/;block.item=/^( *)(bull) [^\n]*(?:\n(?!\1bull )[^\n]*)*/;block.item=replace(block.item,"gm")(/bull/g,block.bullet)();block.list=replace(block.list)(/bull/g,block.bullet)("hr","\\n+(?=\\1?(?:[-*_] *){3,}(?:\\n+|$))")("def","\\n+(?="+block.def.source+")")();block.blockquote=replace(block.blockquote)("def",block.def)();block._tag="(?!(?:"+"a|em|strong|small|s|cite|q|dfn|abbr|data|time|code"+"|var|samp|kbd|sub|sup|i|b|u|mark|ruby|rt|rp|bdi|bdo"+"|span|br|wbr|ins|del|img)\\b)\\w+(?!:/|[^\\w\\s@]*@)\\b";block.html=replace(block.html)("comment",/<!--[\s\S]*?-->/)("closed",/<(tag)[\s\S]+?<\/\1>/)("closing",/<tag(?:"[^"]*"|'[^']*'|[^'">])*?>/)(/tag/g,block._tag)();block.paragraph=replace(block.paragraph)("hr",block.hr)("heading",block.heading)("lheading",block.lheading)("blockquote",block.blockquote)("tag","<"+block._tag)("def",block.def)();block.normal=merge({},block);block.gfm=merge({},block.normal,{fences:/^ *(`{3,}|~{3,}) *(\S+)? *\n([\s\S]+?)\s*\1 *(?:\n+|$)/,paragraph:/^/});block.gfm.paragraph=replace(block.paragraph)("(?!","(?!"+block.gfm.fences.source.replace("\\1","\\2")+"|"+block.list.source.replace("\\1","\\3")+"|")();block.tables=merge({},block.gfm,{nptable:/^ *(\S.*\|.*)\n *([-:]+ *\|[-| :]*)\n((?:.*\|.*(?:\n|$))*)\n*/,table:/^ *\|(.+)\n *\|( *[-:]+[-| :]*)\n((?: *\|.*(?:\n|$))*)\n*/});function Lexer(options){this.tokens=[];this.tokens.links={};this.options=options||marked.defaults;this.rules=block.normal;if(this.options.gfm){if(this.options.tables){this.rules=block.tables}else{this.rules=block.gfm}}}Lexer.rules=block;Lexer.lex=function(src,options){var lexer=new Lexer(options);return lexer.lex(src)};Lexer.prototype.lex=function(src){src=src.replace(/\r\n|\r/g,"\n").replace(/\t/g,"    ").replace(/\u00a0/g," ").replace(/\u2424/g,"\n");return this.token(src,true)};Lexer.prototype.token=function(src,top,bq){var src=src.replace(/^ +$/gm,""),next,loose,cap,bull,b,item,space,i,l;while(src){if(cap=this.rules.newline.exec(src)){src=src.substring(cap[0].length);if(cap[0].length>1){this.tokens.push({type:"space"})}}if(cap=this.rules.code.exec(src)){src=src.substring(cap[0].length);cap=cap[0].replace(/^ {4}/gm,"");this.tokens.push({type:"code",text:!this.options.pedantic?cap.replace(/\n+$/,""):cap});continue}if(cap=this.rules.fences.exec(src)){src=src.substring(cap[0].length);this.tokens.push({type:"code",lang:cap[2],text:cap[3]});continue}if(cap=this.rules.heading.exec(src)){src=src.substring(cap[0].length);this.tokens.push({type:"heading",depth:cap[1].length,text:cap[2]});continue}if(top&&(cap=this.rules.nptable.exec(src))){src=src.substring(cap[0].length);item={type:"table",header:cap[1].replace(/^ *| *\| *$/g,"").split(/ *\| */),align:cap[2].replace(/^ *|\| *$/g,"").split(/ *\| */),cells:cap[3].replace(/\n$/,"").split("\n")};for(i=0;i<item.align.length;i++){if(/^ *-+: *$/.test(item.align[i])){item.align[i]="right"}else if(/^ *:-+: *$/.test(item.align[i])){item.align[i]="center"}else if(/^ *:-+ *$/.test(item.align[i])){item.align[i]="left"}else{item.align[i]=null}}for(i=0;i<item.cells.length;i++){item.cells[i]=item.cells[i].split(/ *\| */)}this.tokens.push(item);continue}if(cap=this.rules.lheading.exec(src)){src=src.substring(cap[0].length);this.tokens.push({type:"heading",depth:cap[2]==="="?1:2,text:cap[1]});continue}if(cap=this.rules.hr.exec(src)){src=src.substring(cap[0].length);this.tokens.push({type:"hr"});continue}if(cap=this.rules.blockquote.exec(src)){src=src.substring(cap[0].length);this.tokens.push({type:"blockquote_start"});cap=cap[0].replace(/^ *> ?/gm,"");this.token(cap,top,true);this.tokens.push({type:"blockquote_end"});continue}if(cap=this.rules.list.exec(src)){src=src.substring(cap[0].length);bull=cap[2];this.tokens.push({type:"list_start",ordered:bull.length>1});cap=cap[0].match(this.rules.item);next=false;l=cap.length;i=0;for(;i<l;i++){item=cap[i];space=item.length;item=item.replace(/^ *([*+-]|\d+\.) +/,"");if(~item.indexOf("\n ")){space-=item.length;item=!this.options.pedantic?item.replace(new RegExp("^ {1,"+space+"}","gm"),""):item.replace(/^ {1,4}/gm,"")}if(this.options.smartLists&&i!==l-1){b=block.bullet.exec(cap[i+1])[0];if(bull!==b&&!(bull.length>1&&b.length>1)){src=cap.slice(i+1).join("\n")+src;i=l-1}}loose=next||/\n\n(?!\s*$)/.test(item);if(i!==l-1){next=item.charAt(item.length-1)==="\n";if(!loose)loose=next}this.tokens.push({type:loose?"loose_item_start":"list_item_start"});this.token(item,false,bq);this.tokens.push({type:"list_item_end"})}this.tokens.push({type:"list_end"});continue}if(cap=this.rules.html.exec(src)){src=src.substring(cap[0].length);this.tokens.push({type:this.options.sanitize?"paragraph":"html",pre:cap[1]==="pre"||cap[1]==="script"||cap[1]==="style",text:cap[0]});continue}if(!bq&&top&&(cap=this.rules.def.exec(src))){src=src.substring(cap[0].length);this.tokens.links[cap[1].toLowerCase()]={href:cap[2],title:cap[3]};continue}if(top&&(cap=this.rules.table.exec(src))){src=src.substring(cap[0].length);item={type:"table",header:cap[1].replace(/^ *| *\| *$/g,"").split(/ *\| */),align:cap[2].replace(/^ *|\| *$/g,"").split(/ *\| */),cells:cap[3].replace(/(?: *\| *)?\n$/,"").split("\n")};for(i=0;i<item.align.length;i++){if(/^ *-+: *$/.test(item.align[i])){item.align[i]="right"}else if(/^ *:-+: *$/.test(item.align[i])){item.align[i]="center"}else if(/^ *:-+ *$/.test(item.align[i])){item.align[i]="left"}else{item.align[i]=null}}for(i=0;i<item.cells.length;i++){item.cells[i]=item.cells[i].replace(/^ *\| *| *\| *$/g,"").split(/ *\| */)}this.tokens.push(item);continue}if(top&&(cap=this.rules.paragraph.exec(src))){src=src.substring(cap[0].length);this.tokens.push({type:"paragraph",text:cap[1].charAt(cap[1].length-1)==="\n"?cap[1].slice(0,-1):cap[1]});continue}if(cap=this.rules.text.exec(src)){src=src.substring(cap[0].length);this.tokens.push({type:"text",text:cap[0]});continue}if(src){throw new Error("Infinite loop on byte: "+src.charCodeAt(0))}}return this.tokens};var inline={escape:/^\\([\\`*{}\[\]()#+\-.!_>])/,autolink:/^<([^ >]+(@|:\/)[^ >]+)>/,url:noop,tag:/^<!--[\s\S]*?-->|^<\/?\w+(?:"[^"]*"|'[^']*'|[^'">])*?>/,link:/^!?\[(inside)\]\(href\)/,reflink:/^!?\[(inside)\]\s*\[([^\]]*)\]/,nolink:/^!?\[((?:\[[^\]]*\]|[^\[\]])*)\]/,strong:/^__([\s\S]+?)__(?!_)|^\*\*([\s\S]+?)\*\*(?!\*)/,em:/^\b_((?:__|[\s\S])+?)_\b|^\*((?:\*\*|[\s\S])+?)\*(?!\*)/,code:/^(`+)\s*([\s\S]*?[^`])\s*\1(?!`)/,br:/^ {2,}\n(?!\s*$)/,del:noop,text:/^[\s\S]+?(?=[\\<!\[_*`]| {2,}\n|$)/};inline._inside=/(?:\[[^\]]*\]|[^\[\]]|\](?=[^\[]*\]))*/;inline._href=/\s*<?([\s\S]*?)>?(?:\s+['"]([\s\S]*?)['"])?\s*/;inline.link=replace(inline.link)("inside",inline._inside)("href",inline._href)();inline.reflink=replace(inline.reflink)("inside",inline._inside)();inline.normal=merge({},inline);inline.pedantic=merge({},inline.normal,{strong:/^__(?=\S)([\s\S]*?\S)__(?!_)|^\*\*(?=\S)([\s\S]*?\S)\*\*(?!\*)/,em:/^_(?=\S)([\s\S]*?\S)_(?!_)|^\*(?=\S)([\s\S]*?\S)\*(?!\*)/});inline.gfm=merge({},inline.normal,{escape:replace(inline.escape)("])","~|])")(),url:/^(https?:\/\/[^\s<]+[^<.,:;"')\]\s])/,del:/^~~(?=\S)([\s\S]*?\S)~~/,text:replace(inline.text)("]|","~]|")("|","|https?://|")()});inline.breaks=merge({},inline.gfm,{br:replace(inline.br)("{2,}","*")(),text:replace(inline.gfm.text)("{2,}","*")()});function InlineLexer(links,options){this.options=options||marked.defaults;this.links=links;this.rules=inline.normal;this.renderer=this.options.renderer||new Renderer;this.renderer.options=this.options;if(!this.links){throw new Error("Tokens array requires a `links` property.")}if(this.options.gfm){if(this.options.breaks){this.rules=inline.breaks}else{this.rules=inline.gfm}}else if(this.options.pedantic){this.rules=inline.pedantic}}InlineLexer.rules=inline;InlineLexer.output=function(src,links,options){var inline=new InlineLexer(links,options);return inline.output(src)};InlineLexer.prototype.output=function(src){var out="",link,text,href,cap;while(src){if(cap=this.rules.escape.exec(src)){src=src.substring(cap[0].length);out+=cap[1];continue}if(cap=this.rules.autolink.exec(src)){src=src.substring(cap[0].length);if(cap[2]==="@"){text=cap[1].charAt(6)===":"?this.mangle(cap[1].substring(7)):this.mangle(cap[1]);href=this.mangle("mailto:")+text}else{text=escape(cap[1]);href=text}out+=this.renderer.link(href,null,text);continue}if(!this.inLink&&(cap=this.rules.url.exec(src))){src=src.substring(cap[0].length);text=escape(cap[1]);href=text;out+=this.renderer.link(href,null,text);continue}if(cap=this.rules.tag.exec(src)){if(!this.inLink&&/^<a /i.test(cap[0])){this.inLink=true}else if(this.inLink&&/^<\/a>/i.test(cap[0])){this.inLink=false}src=src.substring(cap[0].length);out+=this.options.sanitize?escape(cap[0]):cap[0];continue}if(cap=this.rules.link.exec(src)){src=src.substring(cap[0].length);this.inLink=true;out+=this.outputLink(cap,{href:cap[2],title:cap[3]});this.inLink=false;continue}if((cap=this.rules.reflink.exec(src))||(cap=this.rules.nolink.exec(src))){src=src.substring(cap[0].length);link=(cap[2]||cap[1]).replace(/\s+/g," ");link=this.links[link.toLowerCase()];if(!link||!link.href){out+=cap[0].charAt(0);src=cap[0].substring(1)+src;continue}this.inLink=true;out+=this.outputLink(cap,link);this.inLink=false;continue}if(cap=this.rules.strong.exec(src)){src=src.substring(cap[0].length);out+=this.renderer.strong(this.output(cap[2]||cap[1]));continue}if(cap=this.rules.em.exec(src)){src=src.substring(cap[0].length);out+=this.renderer.em(this.output(cap[2]||cap[1]));continue}if(cap=this.rules.code.exec(src)){src=src.substring(cap[0].length);out+=this.renderer.codespan(escape(cap[2],true));continue}if(cap=this.rules.br.exec(src)){src=src.substring(cap[0].length);out+=this.renderer.br();continue}if(cap=this.rules.del.exec(src)){src=src.substring(cap[0].length);out+=this.renderer.del(this.output(cap[1]));continue}if(cap=this.rules.text.exec(src)){src=src.substring(cap[0].length);out+=escape(this.smartypants(cap[0]));continue}if(src){throw new Error("Infinite loop on byte: "+src.charCodeAt(0))}}return out};InlineLexer.prototype.outputLink=function(cap,link){var href=escape(link.href),title=link.title?escape(link.title):null;return cap[0].charAt(0)!=="!"?this.renderer.link(href,title,this.output(cap[1])):this.renderer.image(href,title,escape(cap[1]))};InlineLexer.prototype.smartypants=function(text){if(!this.options.smartypants)return text;return text.replace(/--/g,"—").replace(/(^|[-\u2014/(\[{"\s])'/g,"$1‘").replace(/'/g,"’").replace(/(^|[-\u2014/(\[{\u2018\s])"/g,"$1“").replace(/"/g,"”").replace(/\.{3}/g,"…")};InlineLexer.prototype.mangle=function(text){var out="",l=text.length,i=0,ch;for(;i<l;i++){ch=text.charCodeAt(i);if(Math.random()>.5){ch="x"+ch.toString(16)}out+="&#"+ch+";"}return out};function Renderer(options){this.options=options||{}}Renderer.prototype.code=function(code,lang,escaped){if(this.options.highlight){var out=this.options.highlight(code,lang);if(out!=null&&out!==code){escaped=true;code=out}}if(!lang){return"<pre><code>"+(escaped?code:escape(code,true))+"\n</code></pre>"}return'<pre><code class="'+this.options.langPrefix+escape(lang,true)+'">'+(escaped?code:escape(code,true))+"\n</code></pre>\n"};Renderer.prototype.blockquote=function(quote){return"<blockquote>\n"+quote+"</blockquote>\n"};Renderer.prototype.html=function(html){return html};Renderer.prototype.heading=function(text,level,raw){return"<h"+level+' id="'+this.options.headerPrefix+raw.toLowerCase().replace(/[^\w]+/g,"-")+'">'+text+"</h"+level+">\n"};Renderer.prototype.hr=function(){return this.options.xhtml?"<hr/>\n":"<hr>\n"};Renderer.prototype.list=function(body,ordered){var type=ordered?"ol":"ul";return"<"+type+">\n"+body+"</"+type+">\n"};Renderer.prototype.listitem=function(text){return"<li>"+text+"</li>\n"};Renderer.prototype.paragraph=function(text){return"<p>"+text+"</p>\n"};Renderer.prototype.table=function(header,body){return"<table>\n"+"<thead>\n"+header+"</thead>\n"+"<tbody>\n"+body+"</tbody>\n"+"</table>\n"};Renderer.prototype.tablerow=function(content){return"<tr>\n"+content+"</tr>\n"};Renderer.prototype.tablecell=function(content,flags){var type=flags.header?"th":"td";var tag=flags.align?"<"+type+' style="text-align:'+flags.align+'">':"<"+type+">";return tag+content+"</"+type+">\n"};Renderer.prototype.strong=function(text){return"<strong>"+text+"</strong>"};Renderer.prototype.em=function(text){return"<em>"+text+"</em>"};Renderer.prototype.codespan=function(text){return"<code>"+text+"</code>"};Renderer.prototype.br=function(){return this.options.xhtml?"<br/>":"<br>"};Renderer.prototype.del=function(text){return"<del>"+text+"</del>"};Renderer.prototype.link=function(href,title,text){if(this.options.sanitize){try{var prot=decodeURIComponent(unescape(href)).replace(/[^\w:]/g,"").toLowerCase()}catch(e){return""}if(prot.indexOf("javascript:")===0){return""}}var out='<a href="'+href+'"';if(title){out+=' title="'+title+'"'}out+=">"+text+"</a>";return out};Renderer.prototype.image=function(href,title,text){var out='<img src="'+href+'" alt="'+text+'"';if(title){out+=' title="'+title+'"'}out+=this.options.xhtml?"/>":">";return out};function Parser(options){this.tokens=[];this.token=null;this.options=options||marked.defaults;this.options.renderer=this.options.renderer||new Renderer;this.renderer=this.options.renderer;this.renderer.options=this.options}Parser.parse=function(src,options,renderer){var parser=new Parser(options,renderer);return parser.parse(src)};Parser.prototype.parse=function(src){this.inline=new InlineLexer(src.links,this.options,this.renderer);this.tokens=src.reverse();var out="";while(this.next()){out+=this.tok()}return out};Parser.prototype.next=function(){return this.token=this.tokens.pop()};Parser.prototype.peek=function(){return this.tokens[this.tokens.length-1]||0};Parser.prototype.parseText=function(){var body=this.token.text;while(this.peek().type==="text"){body+="\n"+this.next().text}return this.inline.output(body)};Parser.prototype.tok=function(){switch(this.token.type){case"space":{return""}case"hr":{return this.renderer.hr()}case"heading":{return this.renderer.heading(this.inline.output(this.token.text),this.token.depth,this.token.text)}case"code":{return this.renderer.code(this.token.text,this.token.lang,this.token.escaped)}case"table":{var header="",body="",i,row,cell,flags,j;cell="";for(i=0;i<this.token.header.length;i++){flags={header:true,align:this.token.align[i]};cell+=this.renderer.tablecell(this.inline.output(this.token.header[i]),{header:true,align:this.token.align[i]})}header+=this.renderer.tablerow(cell);for(i=0;i<this.token.cells.length;i++){row=this.token.cells[i];cell="";for(j=0;j<row.length;j++){cell+=this.renderer.tablecell(this.inline.output(row[j]),{header:false,align:this.token.align[j]})}body+=this.renderer.tablerow(cell)}return this.renderer.table(header,body)}case"blockquote_start":{var body="";while(this.next().type!=="blockquote_end"){body+=this.tok()}return this.renderer.blockquote(body)}case"list_start":{var body="",ordered=this.token.ordered;while(this.next().type!=="list_end"){body+=this.tok()}return this.renderer.list(body,ordered)}case"list_item_start":{var body="";while(this.next().type!=="list_item_end"){body+=this.token.type==="text"?this.parseText():this.tok()}return this.renderer.listitem(body)}case"loose_item_start":{var body="";while(this.next().type!=="list_item_end"){body+=this.tok()}return this.renderer.listitem(body)}case"html":{var html=!this.token.pre&&!this.options.pedantic?this.inline.output(this.token.text):this.token.text;return this.renderer.html(html)}case"paragraph":{return this.renderer.paragraph(this.inline.output(this.token.text))}case"text":{return this.renderer.paragraph(this.parseText())}}};function escape(html,encode){return html.replace(!encode?/&(?!#?\w+;)/g:/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;")}function unescape(html){return html.replace(/&([#\w]+);/g,function(_,n){n=n.toLowerCase();if(n==="colon")return":";if(n.charAt(0)==="#"){return n.charAt(1)==="x"?String.fromCharCode(parseInt(n.substring(2),16)):String.fromCharCode(+n.substring(1))}return""})}function replace(regex,opt){regex=regex.source;opt=opt||"";return function self(name,val){if(!name)return new RegExp(regex,opt);val=val.source||val;val=val.replace(/(^|[^\[])\^/g,"$1");regex=regex.replace(name,val);return self}}function noop(){}noop.exec=noop;function merge(obj){var i=1,target,key;for(;i<arguments.length;i++){target=arguments[i];for(key in target){if(Object.prototype.hasOwnProperty.call(target,key)){obj[key]=target[key]}}}return obj}function marked(src,opt,callback){if(callback||typeof opt==="function"){if(!callback){callback=opt;opt=null}opt=merge({},marked.defaults,opt||{});var highlight=opt.highlight,tokens,pending,i=0;try{tokens=Lexer.lex(src,opt)}catch(e){return callback(e)}pending=tokens.length;var done=function(err){if(err){opt.highlight=highlight;return callback(err)}var out;try{out=Parser.parse(tokens,opt)}catch(e){err=e}opt.highlight=highlight;return err?callback(err):callback(null,out)};if(!highlight||highlight.length<3){return done()}delete opt.highlight;if(!pending)return done();for(;i<tokens.length;i++){(function(token){if(token.type!=="code"){return--pending||done()}return highlight(token.text,token.lang,function(err,code){if(err)return done(err);if(code==null||code===token.text){return--pending||done()}token.text=code;token.escaped=true;--pending||done()})})(tokens[i])}return}try{if(opt)opt=merge({},marked.defaults,opt);return Parser.parse(Lexer.lex(src,opt),opt)}catch(e){e.message+="\nPlease report this to https://github.com/chjj/marked.";if((opt||marked.defaults).silent){return"<p>An error occured:</p><pre>"+escape(e.message+"",true)+"</pre>"}throw e}}marked.options=marked.setOptions=function(opt){merge(marked.defaults,opt);return marked};marked.defaults={gfm:true,tables:true,breaks:false,pedantic:false,sanitize:false,smartLists:false,silent:false,highlight:null,langPrefix:"lang-",smartypants:false,headerPrefix:"",renderer:new Renderer,xhtml:false};marked.Parser=Parser;marked.parser=Parser.parse;marked.Renderer=Renderer;marked.Lexer=Lexer;marked.lexer=Lexer.lex;marked.InlineLexer=InlineLexer;marked.inlineLexer=InlineLexer.output;marked.parse=marked;if(typeof module!=="undefined"&&typeof exports==="object"){module.exports=marked}else if(typeof define==="function"&&define.amd){define(function(){return marked})}else{this.marked=marked}}).call(function(){return this||(typeof window!=="undefined"?window:global)}());
+
+		return module.exports;
+	})();
+
+	function formatOptions(options) {
+		var toHighlight = function (code, lang) {
+			if (!lang && options.defaultHighlighting.ctor === 'Just')
+			{
+				lang = options.defaultHighlighting._0;
+			}
+			if (typeof hljs !== 'undefined'
+				&& lang
+				&& hljs.listLanguages().indexOf(lang) >= 0)
+			{
+				return hljs.highlight(lang, code, true).value;
+			}
+			return code;
+		};
+		var gfm = options.githubFlavored;
+		if (gfm.ctor === 'Just')
+		{
+			return {
+				highlight: toHighlight,
+				gfm: true,
+				tables: gfm._0.tables,
+				breaks: gfm._0.breaks,
+				sanitize: options.sanitize,
+				smartypants: options.smartypants
+			};
+		}
+		else
+		{
+			return {
+				highlight: toHighlight,
+				gfm: false,
+				tables: false,
+				breaks: false,
+				sanitize: options.sanitize,
+				smartypants: options.smartypants
+			};
+		}
+	}
+
+	function toHtmlWith(options, rawMarkdown)
+	{
+		return new MarkdownWidget(options, rawMarkdown);
+	}
+
+	function MarkdownWidget(options, rawMarkdown)
+	{
+		this.options = options;
+		this.markdown = rawMarkdown;
+	}
+
+	MarkdownWidget.prototype.type = "Widget";
+
+	MarkdownWidget.prototype.init = function init()
+	{
+		var html = marked(this.markdown, formatOptions(this.options));
+		var div = document.createElement('div');
+		div.innerHTML = html;
+		return div;
+	};
+
+	MarkdownWidget.prototype.update = function update(previous, node)
+	{
+		if (this.markdown !== previous.markdown || this.options != previous.options)
+		{
+			var html = marked(this.markdown, formatOptions(this.options));
+			node.innerHTML = html;
+		}
+		return node;
+	};
+
+
+	function toElementWith(options, rawMarkdown)
+	{
+		return Element.markdown(marked(rawMarkdown, formatOptions(options)));
+	}
+
+	return Elm.Native.Markdown.values = {
+		toHtmlWith: F2(toHtmlWith),
+		toElementWith: F2(toElementWith)
+	};
+};
+
+Elm.Markdown = Elm.Markdown || {};
+Elm.Markdown.make = function (_elm) {
+   "use strict";
+   _elm.Markdown = _elm.Markdown || {};
+   if (_elm.Markdown.values) return _elm.Markdown.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Graphics$Element = Elm.Graphics.Element.make(_elm),
+   $Html = Elm.Html.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Native$Markdown = Elm.Native.Markdown.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm);
+   var _op = {};
+   var toElementWith = $Native$Markdown.toElementWith;
+   var toHtmlWith = $Native$Markdown.toHtmlWith;
+   var defaultOptions = {githubFlavored: $Maybe.Just({tables: false,breaks: false}),defaultHighlighting: $Maybe.Nothing,sanitize: false,smartypants: false};
+   var Options = F4(function (a,b,c,d) {    return {githubFlavored: a,defaultHighlighting: b,sanitize: c,smartypants: d};});
+   var toElement = function (string) {    return A2($Native$Markdown.toElementWith,defaultOptions,string);};
+   var toHtml = function (string) {    return A2($Native$Markdown.toHtmlWith,defaultOptions,string);};
+   return _elm.Markdown.values = {_op: _op
+                                 ,toHtml: toHtml
+                                 ,toElement: toElement
+                                 ,Options: Options
+                                 ,defaultOptions: defaultOptions
+                                 ,toHtmlWith: toHtmlWith
+                                 ,toElementWith: toElementWith};
+};
 Elm.StartApp = Elm.StartApp || {};
 Elm.StartApp.make = function (_elm) {
    "use strict";
@@ -11163,35 +11309,55 @@ Elm.AutoComplete.make = function (_elm) {
    $String = Elm.String.make(_elm),
    $Task = Elm.Task.make(_elm);
    var _op = {};
-   var moveSelection = F2(function (key,model) {    return _U.update(model,{selection: model.selection + key.y});});
+   var getAt = F2(function (xs,idx) {    return $List.head(A2($List.drop,idx,xs));});
    var backupCompletions = _U.list([]);
    var completionMatch = F2(function (command,completion) {    return A2($String.startsWith,$String.toLower(command),completion.command);});
-   var Model = F2(function (a,b) {    return {selection: a,completions: b};});
-   var init = A2(Model,0,_U.list([]));
-   var update = F2(function (action,model) {
-      var _p0 = action;
-      switch (_p0.ctor)
-      {case "StoreCompletions": var newModel = A2(Model,0,A2($Maybe.withDefault,backupCompletions,_p0._0));
-           return {ctor: "_Tuple2",_0: newModel,_1: $Effects.none};
-         case "ArrowPress": var newModel = A2(moveSelection,_p0._0,model);
-           return {ctor: "_Tuple2",_0: newModel,_1: $Effects.none};
-         default: return {ctor: "_Tuple2",_0: model,_1: $Effects.none};}
-   });
+   var Model = F3(function (a,b,c) {    return {selection: a,visible: b,completions: c};});
+   var init = A3(Model,0,false,_U.list([]));
    var Completion = F2(function (a,b) {    return {command: a,info: b};});
    var decodeCompletion = $Json$Decode.list(A3($Json$Decode.object2,
    F2(function (action,info) {    return A2(Completion,action,info);}),
    A2($Json$Decode._op[":="],"command",$Json$Decode.string),
    A2($Json$Decode._op[":="],"info",$Json$Decode.string)));
+   var ShowCompletion = function (a) {    return {ctor: "ShowCompletion",_0: a};};
    var Complete = function (a) {    return {ctor: "Complete",_0: a};};
-   var show = F2(function (address,completion) {
+   var show = F4(function (address,selected,current,completion) {
+      var completionClass = _U.eq(selected,current) ? "selected-completion completion" : "completion";
       return A2($Html.li,
-      _U.list([A2($Html$Events.onClick,address,Complete(completion.command)),$Html$Attributes.$class("completion")]),
+      _U.list([A2($Html$Events.onClick,address,Complete(completion.command)),$Html$Attributes.$class(completionClass)]),
       _U.list([A2($Html.b,_U.list([$Html$Attributes.$class("command")]),_U.list([$Html.text(completion.command)]))
               ,A2($Html.i,_U.list([$Html$Attributes.$class("info")]),_U.list([$Html.text(completion.info)]))]));
    });
    var view = F3(function (address,command,model) {
       var visible = A2($List.filter,completionMatch(command),model.completions);
-      return A2($Html.ul,_U.list([$Html$Attributes.$class("completions")]),A2($List.map,show(address),visible));
+      return model.visible ? A2($Html.ul,
+      _U.list([$Html$Attributes.$class("completions")]),
+      A2($List.indexedMap,A2(show,address,model.selection),visible)) : A2($Html.ul,_U.list([]),_U.list([]));
+   });
+   var moveSelection = F2(function (key,model) {
+      var fx = function () {
+         if (_U.cmp(key.x,0) > 0) {
+               var _p0 = A2(getAt,model.completions,model.selection);
+               if (_p0.ctor === "Just") {
+                     return $Effects.task($Task.succeed(Complete(_p0._0.command)));
+                  } else {
+                     return $Effects.none;
+                  }
+            } else return $Effects.none;
+      }();
+      var potentialSelection = model.selection - key.y;
+      var newSelection = _U.cmp(potentialSelection,0) > -1 && _U.cmp(potentialSelection,
+      $List.length(model.completions)) < 0 ? potentialSelection : model.selection;
+      return {ctor: "_Tuple2",_0: _U.update(model,{selection: newSelection}),_1: fx};
+   });
+   var update = F2(function (action,model) {
+      var _p1 = action;
+      switch (_p1.ctor)
+      {case "StoreCompletions": var newModel = _U.update(model,{completions: A2($Maybe.withDefault,backupCompletions,_p1._0)});
+           return {ctor: "_Tuple2",_0: newModel,_1: $Effects.none};
+         case "ArrowPress": return A2(moveSelection,_p1._0,model);
+         case "Complete": return {ctor: "_Tuple2",_0: model,_1: $Effects.none};
+         default: return {ctor: "_Tuple2",_0: _U.update(model,{visible: _p1._0}),_1: $Effects.none};}
    });
    var ArrowPress = function (a) {    return {ctor: "ArrowPress",_0: a};};
    var StoreCompletions = function (a) {    return {ctor: "StoreCompletions",_0: a};};
@@ -11202,6 +11368,7 @@ Elm.AutoComplete.make = function (_elm) {
                                      ,StoreCompletions: StoreCompletions
                                      ,ArrowPress: ArrowPress
                                      ,Complete: Complete
+                                     ,ShowCompletion: ShowCompletion
                                      ,Completion: Completion
                                      ,Model: Model
                                      ,init: init
@@ -11209,6 +11376,7 @@ Elm.AutoComplete.make = function (_elm) {
                                      ,completionMatch: completionMatch
                                      ,view: view
                                      ,backupCompletions: backupCompletions
+                                     ,getAt: getAt
                                      ,moveSelection: moveSelection
                                      ,update: update
                                      ,decodeCompletion: decodeCompletion
@@ -11222,22 +11390,49 @@ Elm.Card.make = function (_elm) {
    var _U = Elm.Native.Utils.make(_elm),
    $Basics = Elm.Basics.make(_elm),
    $Debug = Elm.Debug.make(_elm),
+   $Effects = Elm.Effects.make(_elm),
    $Html = Elm.Html.make(_elm),
    $Html$Attributes = Elm.Html.Attributes.make(_elm),
+   $Http = Elm.Http.make(_elm),
+   $Json$Decode = Elm.Json.Decode.make(_elm),
    $List = Elm.List.make(_elm),
+   $Markdown = Elm.Markdown.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
    $Result = Elm.Result.make(_elm),
-   $Signal = Elm.Signal.make(_elm);
+   $Signal = Elm.Signal.make(_elm),
+   $Task = Elm.Task.make(_elm);
    var _op = {};
-   var view = F2(function (action,model) {
+   var show = F2(function (address,card) {
       return A2($Html.div,
       _U.list([$Html$Attributes.$class("card")]),
-      _U.list([A2($Html.h1,_U.list([$Html$Attributes.$class("title")]),_U.list([$Html.text(model.title)]))
-              ,A2($Html.p,_U.list([$Html$Attributes.$class("body")]),_U.list([$Html.text(model.body)]))]));
+      _U.list([A2($Html.h3,_U.list([$Html$Attributes.$class("title")]),_U.list([$Html.text(card.title)])),$Markdown.toHtml(card.body)]));
    });
+   var view = F2(function (address,model) {    return A2($Html.div,_U.list([]),A2($List.map,show(address),model));});
+   var Add = function (a) {    return {ctor: "Add",_0: a};};
+   var Get = function (a) {    return {ctor: "Get",_0: a};};
    var NoOp = {ctor: "NoOp"};
-   var Model = F2(function (a,b) {    return {title: a,body: b};});
-   return _elm.Card.values = {_op: _op,Model: Model,NoOp: NoOp,view: view};
+   var Card = F2(function (a,b) {    return {title: a,body: b};});
+   var decodeCard = A3($Json$Decode.object2,
+   F2(function (title,body) {    return A2(Card,title,body);}),
+   A2($Json$Decode._op[":="],"title",$Json$Decode.string),
+   A2($Json$Decode._op[":="],"body",$Json$Decode.string));
+   var getCard = function (command) {    return $Effects.task(A2($Task.map,Add,$Task.toMaybe(A2($Http.get,decodeCard,A2($Basics._op["++"],"?q=",command)))));};
+   var update = F2(function (action,model) {
+      var _p0 = action;
+      switch (_p0.ctor)
+      {case "Get": return {ctor: "_Tuple2",_0: model,_1: getCard(_p0._0)};
+         case "Add": var newModel = function () {
+              var _p1 = _p0._0;
+              if (_p1.ctor === "Just") {
+                    return A2($List._op["::"],_p1._0,model);
+                 } else {
+                    return model;
+                 }
+           }();
+           return {ctor: "_Tuple2",_0: newModel,_1: $Effects.none};
+         default: return {ctor: "_Tuple2",_0: model,_1: $Effects.none};}
+   });
+   return _elm.Card.values = {_op: _op,Card: Card,NoOp: NoOp,Get: Get,Add: Add,show: show,view: view,update: update,getCard: getCard,decodeCard: decodeCard};
 };
 Elm.Input = Elm.Input || {};
 Elm.Input.make = function (_elm) {
@@ -11252,8 +11447,6 @@ Elm.Input.make = function (_elm) {
    $Html = Elm.Html.make(_elm),
    $Html$Attributes = Elm.Html.Attributes.make(_elm),
    $Html$Events = Elm.Html.Events.make(_elm),
-   $Http = Elm.Http.make(_elm),
-   $Json$Decode = Elm.Json.Decode.make(_elm),
    $List = Elm.List.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
    $Result = Elm.Result.make(_elm),
@@ -11262,65 +11455,54 @@ Elm.Input.make = function (_elm) {
    var _op = {};
    var StoreVal = function (a) {    return {ctor: "StoreVal",_0: a};};
    var AutoComplete = function (a) {    return {ctor: "AutoComplete",_0: a};};
-   var Completions = function (a) {    return {ctor: "Completions",_0: a};};
-   var Request = {ctor: "Request"};
-   var Add = function (a) {    return {ctor: "Add",_0: a};};
-   var NoOp = {ctor: "NoOp"};
-   var handleKeyPress = function (code) {    return _U.eq(code,13) ? Request : NoOp;};
-   var view = F2(function (address,model) {
-      return A2($Html.div,
-      _U.list([$Html$Attributes.id("app")]),
-      _U.list([A2($Html.input,
-              _U.list([$Html$Attributes.placeholder("Hey there!")
-                      ,$Html$Attributes.value(model.command)
-                      ,$Html$Attributes.autofocus(true)
-                      ,$Html$Attributes.id("interface")
-                      ,A2($Html$Events.onKeyPress,address,handleKeyPress)
-                      ,A3($Html$Events.on,"input",$Html$Events.targetValue,function (val) {    return A2($Signal.message,address,StoreVal(val));})]),
-              _U.list([]))
-              ,A3($AutoComplete.view,A2($Signal.forwardTo,address,AutoComplete),model.command,model.completions)]));
-   });
-   var Card = F2(function (a,b) {    return {title: a,body: b};});
-   var decodeCard = A3($Json$Decode.object2,
-   F2(function (title,body) {    return A2(Card,title,body);}),
-   A2($Json$Decode._op[":="],"title",$Json$Decode.string),
-   A2($Json$Decode._op[":="],"body",$Json$Decode.string));
-   var getCard = function (command) {    return $Effects.task(A2($Task.map,Add,$Task.toMaybe(A2($Http.get,decodeCard,A2($Basics._op["++"],"?q=",command)))));};
    var update = F2(function (action,model) {
       var _p0 = action;
       switch (_p0.ctor)
-      {case "Request": return {ctor: "_Tuple2",_0: _U.update(model,{command: ""}),_1: getCard(model.command)};
-         case "StoreVal": return {ctor: "_Tuple2",_0: _U.update(model,{command: _p0._0}),_1: $Effects.none};
+      {case "StoreVal": return {ctor: "_Tuple2",_0: _U.update(model,{command: _p0._0}),_1: $Effects.none};
          case "Completions": return {ctor: "_Tuple2",_0: model,_1: A2($Effects.map,AutoComplete,$AutoComplete.fetch("default"))};
          case "AutoComplete": var _p3 = _p0._0;
            var _p1 = _p3;
            if (_p1.ctor === "Complete") {
-                 var newModel = _U.update(model,{command: _p1._0});
-                 return {ctor: "_Tuple2",_0: newModel,_1: $Effects.none};
+                 return {ctor: "_Tuple2",_0: _U.update(model,{command: _p1._0}),_1: $Effects.none};
               } else {
                  var _p2 = A2($AutoComplete.update,_p3,model.completions);
                  var completionsModel = _p2._0;
                  var fx = _p2._1;
                  return {ctor: "_Tuple2",_0: _U.update(model,{completions: completionsModel}),_1: A2($Effects.map,AutoComplete,fx)};
               }
-         case "Add": return {ctor: "_Tuple2",_0: model,_1: $Effects.none};
+         case "Request": return {ctor: "_Tuple2",_0: model,_1: $Effects.none};
          default: return {ctor: "_Tuple2",_0: model,_1: $Effects.none};}
+   });
+   var Completions = function (a) {    return {ctor: "Completions",_0: a};};
+   var Request = function (a) {    return {ctor: "Request",_0: a};};
+   var sendCard = function (command) {    return $Effects.task($Task.succeed(Request(command)));};
+   var NoOp = {ctor: "NoOp"};
+   var handleKeyPress = F2(function (model,code) {    return _U.eq(code,13) ? Request(model.command) : NoOp;});
+   var view = F2(function (address,model) {
+      return A2($Html.div,
+      _U.list([$Html$Attributes.id("app")]),
+      _U.list([A2($Html.input,
+              _U.list([$Html$Attributes.placeholder("Hello")
+                      ,$Html$Attributes.value(model.command)
+                      ,$Html$Attributes.id("interface")
+                      ,A2($Html$Events.onFocus,address,AutoComplete($AutoComplete.ShowCompletion(true)))
+                      ,A2($Html$Events.onKeyPress,address,handleKeyPress(model))
+                      ,A3($Html$Events.on,"input",$Html$Events.targetValue,function (val) {    return A2($Signal.message,address,StoreVal(val));})]),
+              _U.list([]))
+              ,A3($AutoComplete.view,A2($Signal.forwardTo,address,AutoComplete),model.command,model.completions)]));
    });
    var Model = F2(function (a,b) {    return {command: a,completions: b};});
    var init = {ctor: "_Tuple2",_0: A2(Model,"",$AutoComplete.init),_1: A2($Effects.map,AutoComplete,$AutoComplete.fetch("default"))};
    return _elm.Input.values = {_op: _op
                               ,Model: Model
-                              ,Card: Card
                               ,NoOp: NoOp
-                              ,Add: Add
                               ,Request: Request
                               ,Completions: Completions
                               ,AutoComplete: AutoComplete
                               ,StoreVal: StoreVal
                               ,init: init
                               ,update: update
-                              ,decodeCard: decodeCard
-                              ,getCard: getCard
+                              ,sendCard: sendCard
                               ,view: view
                               ,handleKeyPress: handleKeyPress};
 };
@@ -11348,50 +11530,49 @@ Elm.Main.make = function (_elm) {
    var _op = {};
    var Card = function (a) {    return {ctor: "Card",_0: a};};
    var Input = function (a) {    return {ctor: "Input",_0: a};};
+   var update = F2(function (action,model) {
+      var _p0 = action;
+      if (_p0.ctor === "Input") {
+            var _p4 = _p0._0;
+            var _p1 = _p4;
+            if (_p1.ctor === "Request") {
+                  var _p2 = A2($Card.update,$Card.Get(_p1._0),model.cards);
+                  var cards = _p2._0;
+                  var fx = _p2._1;
+                  var input = model.input;
+                  var newInput = _U.update(input,{command: ""});
+                  return {ctor: "_Tuple2",_0: _U.update(model,{input: newInput,cards: cards}),_1: A2($Effects.map,Card,fx)};
+               } else {
+                  var _p3 = A2($Input.update,_p4,model.input);
+                  var input = _p3._0;
+                  var fx = _p3._1;
+                  return {ctor: "_Tuple2",_0: _U.update(model,{input: input}),_1: A2($Effects.map,Input,fx)};
+               }
+         } else {
+            var _p7 = _p0._0;
+            var _p5 = _p7;
+            var _p6 = A2($Card.update,_p7,model.cards);
+            var cards = _p6._0;
+            var fx = _p6._1;
+            return {ctor: "_Tuple2",_0: _U.update(model,{cards: cards}),_1: A2($Effects.map,Card,fx)};
+         }
+   });
    var view = F2(function (address,model) {
       return A2($Html.div,
       _U.list([$Html$Attributes.$class("center")]),
-      _U.list([A2($Input.view,A2($Signal.forwardTo,address,Input),model.input)
-              ,A2($Html.div,_U.list([]),A2($List.map,$Card.view(A2($Signal.forwardTo,address,Card)),model.cards))]));
+      _U.list([A2($Input.view,A2($Signal.forwardTo,address,Input),model.input),A2($Card.view,A2($Signal.forwardTo,address,Card),model.cards)]));
    });
-   var arrowPressAutoCompleteInput = function (_p0) {    return Input($Input.AutoComplete($AutoComplete.ArrowPress(_p0)));};
+   var arrowPressAutoCompleteInput = function (_p8) {    return Input($Input.AutoComplete($AutoComplete.ArrowPress(_p8)));};
    var keyboardInputs = A2($Signal.map,arrowPressAutoCompleteInput,$Keyboard.arrows);
    var Model = F2(function (a,b) {    return {input: a,cards: b};});
    var init = function () {
       var cards = _U.list([]);
-      var _p1 = $Input.init;
-      var input = _p1._0;
-      var fx = _p1._1;
+      var _p9 = $Input.init;
+      var input = _p9._0;
+      var fx = _p9._1;
       return {ctor: "_Tuple2",_0: A2(Model,input,cards),_1: A2($Effects.map,Input,fx)};
    }();
-   var update = F2(function (action,model) {
-      var _p2 = action;
-      if (_p2.ctor === "Input") {
-            var _p6 = _p2._0;
-            var _p3 = _p6;
-            if (_p3.ctor === "Add") {
-                  var cards = function () {
-                     var _p4 = _p3._0;
-                     if (_p4.ctor === "Just") {
-                           return A2($List._op["::"],_p4._0,model.cards);
-                        } else {
-                           return model.cards;
-                        }
-                  }();
-                  var input = model.input;
-                  return {ctor: "_Tuple2",_0: A2(Model,input,cards),_1: $Effects.none};
-               } else {
-                  var cards = model.cards;
-                  var _p5 = A2($Input.update,_p6,model.input);
-                  var input = _p5._0;
-                  var fx = _p5._1;
-                  return {ctor: "_Tuple2",_0: A2(Model,input,cards),_1: A2($Effects.map,Input,fx)};
-               }
-         } else {
-            return {ctor: "_Tuple2",_0: model,_1: $Effects.none};
-         }
-   });
-   var app = $StartApp.start({init: init,view: view,update: update,inputs: _U.list([])});
+   var app = $StartApp.start({init: init,view: view,update: update,inputs: _U.list([keyboardInputs])});
    var tasks = Elm.Native.Task.make(_elm).performSignal("tasks",app.tasks);
    var main = app.html;
    return _elm.Main.values = {_op: _op

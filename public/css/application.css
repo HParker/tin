@@ -37,6 +37,10 @@ body {
     background-color: #F3F1F1;
 }
 
+.selected-completion {
+    background-color: #F3F1F1;
+}
+
 .card {
     border-top: solid 2px #912CE2;
     margin-top: 10px;
