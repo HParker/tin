@@ -14,6 +14,10 @@ GEM
       hache (~> 1.1)
     hmote-render (1.0.0)
       hmote (~> 1.3)
+    httparty (0.13.7)
+      json (~> 1.8)
+      multi_xml (>= 0.5.2)
+    json (1.8.3)
     kuvert (0.0.2)
       mime-types (~> 2.4)
     malone (1.2.0)
@@ -23,6 +27,7 @@ GEM
     mote (1.1.4)
     msgpack (0.5.12)
     mt (0.0.2)
+    multi_xml (0.5.5)
     nido (1.0.0)
     ohm (2.3.0)
       msgpack (~> 0.5.0)
@@ -58,6 +63,8 @@ GEM
       rack (>= 1.0)
     stal (0.1.0)
       redic
+    themoviedb (1.0.1)
+      httparty
 
 PLATFORMS
   ruby
@@ -77,6 +84,7 @@ DEPENDENCIES
   rspec
   scrivener (= 1.0.0)
   shotgun (= 0.9.1)
+  themoviedb
 
 BUNDLED WITH
    1.11.2
