@@ -1,6 +1,8 @@
 Tin
 ========
 
+[Demo](http://fierce-stream-22918.herokuapp.com/)
+
 this is Tin. Tin is meant to be a text interface to a suite of helpful
 tools and knowledge.
 
