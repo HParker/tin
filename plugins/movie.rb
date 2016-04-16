@@ -9,7 +9,7 @@ module Plugins
 
     class << self
       def message(title)
-        info = get_movie_info(title.sub(KEYWORD_NAME,''))
+        info = get_movie_info(title)
         Message.new(action: info[:title], body: info[:text])
       end
 
@@ -23,9 +23,9 @@ module Plugins
           text: <<~MARKDOWN
             ![poster](https://image.tmdb.org/t/p/w396/#{info.poster_path})
 
-            Released: #{info.release_date} \t Rating: #{info.vote_average}/10
+            **Released**: #{info.release_date} \t **Rating**: #{info.vote_average}/10
 
-            #{info.overview}
+            > #{info.overview}
 
             _Info provided by [TMDB](https://www.themoviedb.org/movie/#{info.id})_
           MARKDOWN

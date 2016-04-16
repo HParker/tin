@@ -10,7 +10,7 @@ module Plugins
       end
 
       def completions
-        keywords.map { |key, val|
+        @completions ||= keywords.map { |key, val|
           { command: key, info: val.last }
         }
       end
