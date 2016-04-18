@@ -14,7 +14,7 @@ module Plugins
 
     keyword "help", info: "show info about Tin"
 
-    def self.message(_text)
+    def self.message(_text, _req)
       Message.new(action: "help", body: HELP_MESSAGE)
     end
   end

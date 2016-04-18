@@ -1,7 +1,7 @@
 require_relative '../spec_helper'
 
 RSpec.describe Plugins::Todo do
-  subject { Plugins::Todo.message('clean my car')}
+  subject { Plugins::Todo.message('clean my car', nil)}
   describe '#message' do
     it "should be called a todo" do
       expect(subject.action).to eq('todo')

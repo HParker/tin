@@ -55,7 +55,7 @@ Cuba.define do
 
   on root do
     on param("q") do |query|
-      response = Processor.process(query)
+      response = Processor.process(query, req)
       res.write(JSON.generate(response.as_json))
     end
     render("home")

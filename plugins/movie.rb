@@ -8,7 +8,7 @@ module Plugins
     keyword KEYWORD_NAME, info: "[title] show info about a film"
 
     class << self
-      def message(title)
+      def message(title, _req)
         info = get_movie_info(title)
         Message.new(action: info[:title], body: info[:text])
       end

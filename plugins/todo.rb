@@ -6,7 +6,7 @@ module Plugins
 
     keyword KEYWORD_NAME, info: "whatever you need to get done"
 
-    def self.message(text)
+    def self.message(text, _req)
       Message.new(action: KEYWORD_NAME, body: text)
     end
   end

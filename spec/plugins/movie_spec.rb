@@ -15,7 +15,7 @@ RSpec.describe Plugins::Movie do
         ]
       end
 
-      message = Plugins::Movie.message("deadpool")
+      message = Plugins::Movie.message("deadpool", nil)
       expect(message.action).to eq('Deadpool')
       expect(message.body).to include('asdf.jpg')
       expect(message.body).to include('2016-02-09')
