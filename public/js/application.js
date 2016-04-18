@@ -11393,46 +11393,120 @@ Elm.Card.make = function (_elm) {
    $Effects = Elm.Effects.make(_elm),
    $Html = Elm.Html.make(_elm),
    $Html$Attributes = Elm.Html.Attributes.make(_elm),
+   $Html$Events = Elm.Html.Events.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Markdown = Elm.Markdown.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm);
+   var _op = {};
+   var update = F2(function (action,model) {
+      var _p0 = action;
+      switch (_p0.ctor)
+      {case "Collapse": var toggle = model.collapsed ? false : true;
+           return _U.eq(model.id,_p0._0) ? {ctor: "_Tuple2",_0: _U.update(model,{collapsed: toggle}),_1: $Effects.none} : {ctor: "_Tuple2"
+                                                                                                                          ,_0: model
+                                                                                                                          ,_1: $Effects.none};
+         case "Move": return {ctor: "_Tuple2",_0: model,_1: $Effects.none};
+         default: return {ctor: "_Tuple2",_0: model,_1: $Effects.none};}
+   });
+   var collapse = function (model) {    return _U.update(model,{collapsed: true});};
+   var Move = function (a) {    return {ctor: "Move",_0: a};};
+   var Collapse = function (a) {    return {ctor: "Collapse",_0: a};};
+   var view = F2(function (address,card) {
+      var _p1 = card.collapsed ? {ctor: "_Tuple2",_0: "",_1: "icon octicon octicon-chevron-up"} : {ctor: "_Tuple2"
+                                                                                                  ,_0: card.body
+                                                                                                  ,_1: "icon octicon octicon-chevron-down"};
+      var cardBody = _p1._0;
+      var collapseIcon = _p1._1;
+      return A2($Html.div,
+      _U.list([$Html$Attributes.$class("card")]),
+      _U.list([A2($Html.span,_U.list([$Html$Attributes.$class("title")]),_U.list([$Html.text(card.title)]))
+              ,A2($Html.span,_U.list([$Html$Attributes.$class("icon octicon octicon-pin"),A2($Html$Events.onClick,address,Move(card.id))]),_U.list([]))
+              ,A2($Html.span,_U.list([$Html$Attributes.$class(collapseIcon),A2($Html$Events.onClick,address,Collapse(card.id))]),_U.list([]))
+              ,$Markdown.toHtml(cardBody)]));
+   });
+   var NoOp = {ctor: "NoOp"};
+   var Model = F4(function (a,b,c,d) {    return {title: a,body: b,id: c,collapsed: d};});
+   var build = F3(function (title,body,id) {    return A4(Model,title,body,id,false);});
+   return _elm.Card.values = {_op: _op,Model: Model,NoOp: NoOp,Collapse: Collapse,Move: Move,build: build,collapse: collapse,update: update,view: view};
+};
+Elm.Cards = Elm.Cards || {};
+Elm.Cards.make = function (_elm) {
+   "use strict";
+   _elm.Cards = _elm.Cards || {};
+   if (_elm.Cards.values) return _elm.Cards.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Card = Elm.Card.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Effects = Elm.Effects.make(_elm),
+   $Html = Elm.Html.make(_elm),
    $Http = Elm.Http.make(_elm),
    $Json$Decode = Elm.Json.Decode.make(_elm),
    $List = Elm.List.make(_elm),
-   $Markdown = Elm.Markdown.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
    $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm),
    $Task = Elm.Task.make(_elm);
    var _op = {};
-   var show = F2(function (address,card) {
-      return A2($Html.div,
-      _U.list([$Html$Attributes.$class("card")]),
-      _U.list([A2($Html.h3,_U.list([$Html$Attributes.$class("title")]),_U.list([$Html.text(card.title)])),$Markdown.toHtml(card.body)]));
-   });
-   var view = F2(function (address,model) {    return A2($Html.div,_U.list([]),A2($List.map,show(address),model));});
-   var Add = function (a) {    return {ctor: "Add",_0: a};};
-   var Get = function (a) {    return {ctor: "Get",_0: a};};
-   var NoOp = {ctor: "NoOp"};
-   var Card = F2(function (a,b) {    return {title: a,body: b};});
    var decodeCard = A3($Json$Decode.object2,
-   F2(function (title,body) {    return A2(Card,title,body);}),
+   F2(function (title,body) {    return A2($Card.build,title,body);}),
    A2($Json$Decode._op[":="],"title",$Json$Decode.string),
    A2($Json$Decode._op[":="],"body",$Json$Decode.string));
+   var addCards = F2(function (newCards,model) {    return _U.update(model,{cards: A2($Basics._op["++"],model.cards,newCards)});});
+   var Move = function (a) {    return {ctor: "Move",_0: a};};
+   var Card = function (a) {    return {ctor: "Card",_0: a};};
+   var view = F2(function (address,model) {    return A2($Html.div,_U.list([]),A2($List.map,$Card.view(A2($Signal.forwardTo,address,Card)),model.cards));});
+   var Add = function (a) {    return {ctor: "Add",_0: a};};
    var getCard = function (command) {    return $Effects.task(A2($Task.map,Add,$Task.toMaybe(A2($Http.get,decodeCard,A2($Basics._op["++"],"?q=",command)))));};
    var update = F2(function (action,model) {
       var _p0 = action;
       switch (_p0.ctor)
       {case "Get": return {ctor: "_Tuple2",_0: model,_1: getCard(_p0._0)};
-         case "Add": var newModel = function () {
+         case "Add": var newCards = function () {
               var _p1 = _p0._0;
               if (_p1.ctor === "Just") {
-                    return A2($List._op["::"],_p1._0,model);
+                    return A2($List._op["::"],_p1._0(model.nextID),model.cards);
                  } else {
-                    return model;
+                    return model.cards;
                  }
            }();
-           return {ctor: "_Tuple2",_0: newModel,_1: $Effects.none};
+           return {ctor: "_Tuple2",_0: _U.update(model,{cards: newCards,nextID: model.nextID + 1}),_1: $Effects.none};
+         case "Card": var _p5 = _p0._0;
+           var _p2 = _p5;
+           if (_p2.ctor === "Move") {
+                 var _p3 = _p2._0;
+                 var movingCards = A2($List.map,$Card.collapse,A2($List.filter,function (c) {    return _U.eq(c.id,_p3);},model.cards));
+                 var fx = $Effects.task($Task.succeed(Move(movingCards)));
+                 var newCards = A2($List.filter,function (c) {    return !_U.eq(c.id,_p3);},model.cards);
+                 return {ctor: "_Tuple2",_0: _U.update(model,{cards: newCards}),_1: fx};
+              } else {
+                 var _p4 = $List.unzip(A2($List.map,$Card.update(_p5),model.cards));
+                 var newCards = _p4._0;
+                 var fxs = _p4._1;
+                 return {ctor: "_Tuple2",_0: _U.update(model,{cards: newCards}),_1: A2($Effects.map,Card,$Effects.batch(fxs))};
+              }
+         case "Move": return {ctor: "_Tuple2",_0: model,_1: $Effects.none};
          default: return {ctor: "_Tuple2",_0: model,_1: $Effects.none};}
    });
-   return _elm.Card.values = {_op: _op,Card: Card,NoOp: NoOp,Get: Get,Add: Add,show: show,view: view,update: update,getCard: getCard,decodeCard: decodeCard};
+   var Get = function (a) {    return {ctor: "Get",_0: a};};
+   var NoOp = {ctor: "NoOp"};
+   var Model = F2(function (a,b) {    return {cards: a,nextID: b};});
+   var init = A2(Model,_U.list([]),0);
+   return _elm.Cards.values = {_op: _op
+                              ,Model: Model
+                              ,NoOp: NoOp
+                              ,Get: Get
+                              ,Add: Add
+                              ,Card: Card
+                              ,Move: Move
+                              ,init: init
+                              ,view: view
+                              ,addCards: addCards
+                              ,update: update
+                              ,getCard: getCard
+                              ,decodeCard: decodeCard};
 };
 Elm.Input = Elm.Input || {};
 Elm.Input.make = function (_elm) {
@@ -11514,7 +11588,7 @@ Elm.Main.make = function (_elm) {
    var _U = Elm.Native.Utils.make(_elm),
    $AutoComplete = Elm.AutoComplete.make(_elm),
    $Basics = Elm.Basics.make(_elm),
-   $Card = Elm.Card.make(_elm),
+   $Cards = Elm.Cards.make(_elm),
    $Debug = Elm.Debug.make(_elm),
    $Effects = Elm.Effects.make(_elm),
    $Html = Elm.Html.make(_elm),
@@ -11528,49 +11602,63 @@ Elm.Main.make = function (_elm) {
    $StartApp = Elm.StartApp.make(_elm),
    $Task = Elm.Task.make(_elm);
    var _op = {};
-   var Card = function (a) {    return {ctor: "Card",_0: a};};
+   var Pins = function (a) {    return {ctor: "Pins",_0: a};};
+   var Cards = function (a) {    return {ctor: "Cards",_0: a};};
    var Input = function (a) {    return {ctor: "Input",_0: a};};
    var update = F2(function (action,model) {
       var _p0 = action;
-      if (_p0.ctor === "Input") {
-            var _p4 = _p0._0;
-            var _p1 = _p4;
-            if (_p1.ctor === "Request") {
-                  var _p2 = A2($Card.update,$Card.Get(_p1._0),model.cards);
-                  var cards = _p2._0;
-                  var fx = _p2._1;
-                  var input = model.input;
-                  var newInput = _U.update(input,{command: ""});
-                  return {ctor: "_Tuple2",_0: _U.update(model,{input: newInput,cards: cards}),_1: A2($Effects.map,Card,fx)};
-               } else {
-                  var _p3 = A2($Input.update,_p4,model.input);
-                  var input = _p3._0;
-                  var fx = _p3._1;
-                  return {ctor: "_Tuple2",_0: _U.update(model,{input: input}),_1: A2($Effects.map,Input,fx)};
-               }
-         } else {
-            var _p7 = _p0._0;
-            var _p5 = _p7;
-            var _p6 = A2($Card.update,_p7,model.cards);
-            var cards = _p6._0;
-            var fx = _p6._1;
-            return {ctor: "_Tuple2",_0: _U.update(model,{cards: cards}),_1: A2($Effects.map,Card,fx)};
-         }
+      switch (_p0.ctor)
+      {case "Input": var _p4 = _p0._0;
+           var _p1 = _p4;
+           if (_p1.ctor === "Request") {
+                 var _p2 = A2($Cards.update,$Cards.Get(_p1._0),model.cards);
+                 var cards = _p2._0;
+                 var fx = _p2._1;
+                 var input = model.input;
+                 var newInput = _U.update(input,{command: ""});
+                 return {ctor: "_Tuple2",_0: _U.update(model,{input: newInput,cards: cards}),_1: A2($Effects.map,Cards,fx)};
+              } else {
+                 var _p3 = A2($Input.update,_p4,model.input);
+                 var input = _p3._0;
+                 var fx = _p3._1;
+                 return {ctor: "_Tuple2",_0: _U.update(model,{input: input}),_1: A2($Effects.map,Input,fx)};
+              }
+         case "Cards": var _p7 = _p0._0;
+           var _p5 = _p7;
+           if (_p5.ctor === "Move") {
+                 return {ctor: "_Tuple2",_0: _U.update(model,{pins: A2($Cards.addCards,_p5._0,model.pins)}),_1: $Effects.none};
+              } else {
+                 var _p6 = A2($Cards.update,_p7,model.cards);
+                 var cards = _p6._0;
+                 var fx = _p6._1;
+                 return {ctor: "_Tuple2",_0: _U.update(model,{cards: cards}),_1: A2($Effects.map,Cards,fx)};
+              }
+         default: var _p10 = _p0._0;
+           var _p8 = _p10;
+           if (_p8.ctor === "Move") {
+                 return {ctor: "_Tuple2",_0: _U.update(model,{cards: A2($Cards.addCards,_p8._0,model.cards)}),_1: $Effects.none};
+              } else {
+                 var _p9 = A2($Cards.update,_p10,model.pins);
+                 var cards = _p9._0;
+                 var fx = _p9._1;
+                 return {ctor: "_Tuple2",_0: _U.update(model,{pins: cards}),_1: A2($Effects.map,Pins,fx)};
+              }}
    });
    var view = F2(function (address,model) {
       return A2($Html.div,
       _U.list([$Html$Attributes.$class("center")]),
-      _U.list([A2($Input.view,A2($Signal.forwardTo,address,Input),model.input),A2($Card.view,A2($Signal.forwardTo,address,Card),model.cards)]));
+      _U.list([A2($Input.view,A2($Signal.forwardTo,address,Input),model.input)
+              ,A2($Html.div,_U.list([$Html$Attributes.$class("pins")]),_U.list([A2($Cards.view,A2($Signal.forwardTo,address,Pins),model.pins)]))
+              ,A2($Cards.view,A2($Signal.forwardTo,address,Cards),model.cards)]));
    });
-   var arrowPressAutoCompleteInput = function (_p8) {    return Input($Input.AutoComplete($AutoComplete.ArrowPress(_p8)));};
+   var arrowPressAutoCompleteInput = function (_p11) {    return Input($Input.AutoComplete($AutoComplete.ArrowPress(_p11)));};
    var keyboardInputs = A2($Signal.map,arrowPressAutoCompleteInput,$Keyboard.arrows);
-   var Model = F2(function (a,b) {    return {input: a,cards: b};});
+   var Model = F3(function (a,b,c) {    return {input: a,cards: b,pins: c};});
    var init = function () {
-      var cards = _U.list([]);
-      var _p9 = $Input.init;
-      var input = _p9._0;
-      var fx = _p9._1;
-      return {ctor: "_Tuple2",_0: A2(Model,input,cards),_1: A2($Effects.map,Input,fx)};
+      var _p12 = $Input.init;
+      var input = _p12._0;
+      var fx = _p12._1;
+      return {ctor: "_Tuple2",_0: A3(Model,input,$Cards.init,$Cards.init),_1: A2($Effects.map,Input,fx)};
    }();
    var app = $StartApp.start({init: init,view: view,update: update,inputs: _U.list([keyboardInputs])});
    var tasks = Elm.Native.Task.make(_elm).performSignal("tasks",app.tasks);
@@ -11578,7 +11666,8 @@ Elm.Main.make = function (_elm) {
    return _elm.Main.values = {_op: _op
                              ,Model: Model
                              ,Input: Input
-                             ,Card: Card
+                             ,Cards: Cards
+                             ,Pins: Pins
                              ,init: init
                              ,update: update
                              ,view: view

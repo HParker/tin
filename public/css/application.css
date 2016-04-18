@@ -50,9 +50,30 @@ body {
     width: 330px;
 }
 
+.pins .card {
+    border-top: solid 2px #8489E8;
+}
+
 .title {
+    font-weight: bold;
     margin-top: 5px;
 }
+
+.icon {
+    color: #A5A5A5;
+    padding: 3px;
+    float: right;
+}
+
+.pins .octicon-pin {
+    color: black;
+}
+
+
+.icon:hover {
+    color: black;
+}
+
 
 .body {
     font-size: 18pt;
