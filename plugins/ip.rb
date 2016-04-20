@@ -8,25 +8,25 @@ module Plugins
 
     keyword KEYWORD_NAME, info: "Show information about who you identify yourself as"
 
-    class << self
-      def message(text, req)
-        Message.new(action: 'IP', body: body(req))
-      end
+    def initialize(info)
+      @info = info
+    end
 
-      private
+    def response
+      Message.new(title: KEYWORD_NAME, body: body)
+    end
 
-      def body(req)
-        db = MaxMindDB.new(File.join(ROOT, 'db/GeoLite2-City.mmdb'))
-        location = db.lookup(req.ip)
-        <<~MARKDOWN
-          IP: #{req.ip}
+    private
 
-          **City**: #{location.city.name} \t **Country**: #{location.country.name}
+    def body
+      <<~MARKDOWN
+        IP: #{@info.ip}
 
-         <sub>This product includes GeoLite2 data created by MaxMind, available from
-         <a href="http://www.maxmind.com">http://www.maxmind.com</a>.</sub>
-        MARKDOWN
-      end
+        **City**: #{@info.city_name} \t **Country**: #{@info.country_name}
+
+        <sub>This product includes GeoLite2 data created by MaxMind, available from
+        <a href="http://www.maxmind.com">http://www.maxmind.com</a>.</sub>
+      MARKDOWN
     end
   end
 end

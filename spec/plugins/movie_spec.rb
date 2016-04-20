@@ -2,7 +2,9 @@ require_relative '../spec_helper'
 
 RSpec.describe Plugins::Movie do
   describe "#action" do
-    it "does good" do
+    let(:info) { Info.new("movie deadpool", OpenStruct.new(ip: '0.0.0.0'))}
+    subject { Plugins::Movie.new(info).response }
+    it "returns a movie" do
       expect(Tmdb::Movie).to receive(:find).with('deadpool') do
         [
           OpenStruct.new(
@@ -15,12 +17,11 @@ RSpec.describe Plugins::Movie do
         ]
       end
 
-      message = Plugins::Movie.message("deadpool", nil)
-      expect(message.action).to eq('Deadpool')
-      expect(message.body).to include('asdf.jpg')
-      expect(message.body).to include('2016-02-09')
-      expect(message.body).to include('7.18')
-      expect(message.body).to include('its a movie')
+      expect(subject.title).to eq('Deadpool')
+      expect(subject.body).to include('asdf.jpg')
+      expect(subject.body).to include('2016-02-09')
+      expect(subject.body).to include('7.18')
+      expect(subject.body).to include('its a movie')
     end
   end
 end

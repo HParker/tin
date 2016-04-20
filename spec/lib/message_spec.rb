@@ -1,10 +1,10 @@
 require_relative '../spec_helper'
 
 RSpec.describe Message do
-  let(:subject) { Message.new(action: "hey", body: "ya") }
+  let(:subject) { Message.new(title: "hey", body: "ya") }
 
   describe 'attr_reader' do
-    it { expect(subject.action).to eq("hey") }
+    it { expect(subject.title).to eq("hey") }
     it { expect(subject.body).to eq("ya") }
   end
 

@@ -1,12 +1,12 @@
 class Message
-  attr_reader :action, :body
+  attr_reader :title, :body
 
-  def initialize(action:, body:)
-    @action = action
+  def initialize(title:, body:)
+    @title = title
     @body = body
   end
 
   def as_json
-    { title: action.to_s.capitalize, body: body }
+    { title: title.to_s.capitalize, body: body }
   end
 end

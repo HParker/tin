@@ -1,21 +1,21 @@
 class Processor
   class << self
     def process(text, req)
-      response(parse(text), req)
+      response(info(text, req))
     end
 
     private
 
-    def response(tokens, req)
-      Plugins::Plugin.obj_for(tokens.first.downcase).message(contents(tokens), req)
+    def response(info)
+      plugin(info.keyword).new(info).response
     end
 
-    def parse(text)
-      text.split(' ')
+    def plugin(token)
+      Plugins::Plugin.obj_for(token)
     end
 
-    def contents(tokens)
-      tokens.drop(1).join(' ')
+    def info(text, req)
+      Info.new(text, req)
     end
   end
 end
