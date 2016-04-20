@@ -14,6 +14,8 @@ require_relative "config/settings"
 require_relative "config/database"
 require_relative "config/posten"
 
+ROOT = File.dirname(__FILE__)
+
 Cuba.plugin(Cuba::Safe)
 Cuba.plugin(HMote::Render)
 Cuba.plugin(Ment)

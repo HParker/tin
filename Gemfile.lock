@@ -22,6 +22,7 @@ GEM
       mime-types (~> 2.4)
     malone (1.2.0)
       kuvert (~> 0.0)
+    maxminddb (0.1.11)
     ment (0.2.0)
     mime-types (2.6.2)
     mote (1.1.4)
@@ -75,6 +76,7 @@ DEPENDENCIES
   envoker (= 1.2.0)
   hmote (= 1.4.0)
   hmote-render (= 1.0.0)
+  maxminddb
   ment (= 0.2.0)
   mt (= 0.0.2)
   ohm (= 2.3.0)

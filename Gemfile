@@ -25,3 +25,4 @@ end
 
 # Plugins
 gem 'themoviedb'
+gem 'maxminddb'
