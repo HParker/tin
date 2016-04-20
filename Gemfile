@@ -23,6 +23,8 @@ group :test do
   gem "rack-test", "0.6.3"
 end
 
+gem 'rollbar', '~> 2.8.3'
+
 # Plugins
 gem 'themoviedb'
 gem 'maxminddb'

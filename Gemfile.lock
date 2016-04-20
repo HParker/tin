@@ -28,6 +28,7 @@ GEM
     mote (1.1.4)
     msgpack (0.5.12)
     mt (0.0.2)
+    multi_json (1.11.2)
     multi_xml (0.5.5)
     nido (1.0.0)
     ohm (2.3.0)
@@ -45,6 +46,8 @@ GEM
       rack (>= 1.0)
     redic (1.5.0)
       hiredis
+    rollbar (2.8.3)
+      multi_json
     rspec (3.4.0)
       rspec-core (~> 3.4.0)
       rspec-expectations (~> 3.4.0)
@@ -83,6 +86,7 @@ DEPENDENCIES
   posten (= 0.0.3)
   puma (= 2.14.0)
   rack-test (= 0.6.3)
+  rollbar (~> 2.8.3)
   rspec
   scrivener (= 1.0.0)
   shotgun (= 0.9.1)
