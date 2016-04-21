@@ -1,10 +1,10 @@
 require_relative '../spec_helper'
 
 RSpec.describe Plugins::Movie do
-  describe "#action" do
-    let(:info) { Info.new("movie deadpool", OpenStruct.new(ip: '0.0.0.0'))}
+  describe '#action' do
+    let(:info) { Info.new('movie deadpool', OpenStruct.new(ip: '0.0.0.0')) }
     subject { Plugins::Movie.new(info).response }
-    it "returns a movie" do
+    it 'returns a movie' do
       expect(Tmdb::Movie).to receive(:find).with('deadpool') do
         [
           OpenStruct.new(

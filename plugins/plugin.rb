@@ -1,7 +1,7 @@
 module Plugins
   class Plugin
     class << self
-      def keyword(keyword, info: "")
+      def keyword(keyword, info: '')
         keywords[keyword] = [self, info]
       end
 
@@ -10,9 +10,9 @@ module Plugins
       end
 
       def completions
-        @completions ||= keywords.map { |key, val|
+        @completions ||= keywords.map do |key, val|
           { command: key, info: val.last }
-        }
+        end
       end
 
       private

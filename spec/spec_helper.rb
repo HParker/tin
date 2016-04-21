@@ -1,10 +1,10 @@
-$VERBOSE = !!ENV["VERBOSE"]
+$VERBOSE = !!ENV['VERBOSE']
 
-ENV["RACK_ENV"] = "test"
+ENV['RACK_ENV'] = 'test'
 
-require_relative "../app"
-require "cuba/test"
-require "posten/test"
+require_relative '../app'
+require 'cuba/test'
+require 'posten/test'
 # prepare do
 #   Ohm.flush
 #   Posten.reset

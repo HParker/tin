@@ -2,9 +2,9 @@ require_relative './plugin'
 
 module Plugins
   class Todo < Plugin
-    KEYWORD_NAME = 'todo'
+    KEYWORD_NAME = 'todo'.freeze
 
-    keyword KEYWORD_NAME, info: "whatever you need to get done"
+    keyword KEYWORD_NAME, info: 'whatever you need to get done'
 
     def initialize(info)
       @info = info

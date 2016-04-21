@@ -31,7 +31,7 @@ class Info
   private
 
   def forecast
-    forecast = ForecastIO.forecast(db.location.latitude, db.location.longitude)
+    ForecastIO.forecast(db.location.latitude, db.location.longitude)
   end
 
   def tokens
