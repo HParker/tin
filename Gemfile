@@ -28,3 +28,4 @@ gem 'rollbar', '~> 2.8.3'
 # Plugins
 gem 'themoviedb'
 gem 'maxminddb'
+gem 'forecast_io'

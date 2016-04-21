@@ -6,6 +6,7 @@ RSpec.describe Plugins::Ip do
     subject { Plugins::Ip.new(info) }
 
     it "returns the users ip" do
+      # TODO: this does not stub the geoip2 db
       message = subject.response
       expect(message.title).to eq('whoami')
       expect(message.body).to match("IP")

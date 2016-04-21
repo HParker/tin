@@ -1,6 +1,16 @@
 require "envoker"
+require 'rollbar'
+require 'forecast_io'
 
 Envoker.load
+
+Rollbar.configure do |config|
+  config.access_token = ENV['ROLLBAR_KEY']
+end
+
+ForecastIO.configure do |configuration|
+  configuration.api_key = ENV['FORECAST_IO_KEY']
+end
 
 module Settings
   RACK_ENV       = Envoker.fetch("RACK_ENV", "development")

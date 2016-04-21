@@ -24,7 +24,15 @@ class Info
     db.country.name
   end
 
+  def weather
+    forecast
+  end
+
   private
+
+  def forecast
+    forecast = ForecastIO.forecast(db.location.latitude, db.location.longitude)
+  end
 
   def tokens
     @text.split(' ')
