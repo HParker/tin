@@ -11311,9 +11311,19 @@ Elm.AutoComplete.make = function (_elm) {
    var _op = {};
    var getAt = F2(function (xs,idx) {    return $List.head(A2($List.drop,idx,xs));});
    var backupCompletions = _U.list([]);
-   var completionMatch = F2(function (command,completion) {    return A2($String.startsWith,$String.toLower(command),completion.command);});
-   var Model = F3(function (a,b,c) {    return {selection: a,visible: b,completions: c};});
-   var init = A3(Model,0,false,_U.list([]));
+   var completionMatch = F2(function (command,completion) {
+      var keyword = function () {
+         var _p0 = $List.head(A2($String.split," ",command));
+         if (_p0.ctor === "Just") {
+               return $String.toLower(_p0._0);
+            } else {
+               return "";
+            }
+      }();
+      return A2($String.startsWith,keyword,completion.command);
+   });
+   var Model = F4(function (a,b,c,d) {    return {selection: a,visible: b,completions: c,command: d};});
+   var init = A4(Model,0,false,_U.list([]),"");
    var Completion = F2(function (a,b) {    return {command: a,info: b};});
    var decodeCompletion = $Json$Decode.list(A3($Json$Decode.object2,
    F2(function (action,info) {    return A2(Completion,action,info);}),
@@ -11328,36 +11338,35 @@ Elm.AutoComplete.make = function (_elm) {
       _U.list([A2($Html.b,_U.list([$Html$Attributes.$class("command")]),_U.list([$Html.text(completion.command)]))
               ,A2($Html.i,_U.list([$Html$Attributes.$class("info")]),_U.list([$Html.text(completion.info)]))]));
    });
-   var view = F3(function (address,command,model) {
-      var visible = A2($List.filter,completionMatch(command),model.completions);
+   var view = F2(function (address,model) {
+      var visible = A2($List.filter,completionMatch(model.command),model.completions);
       return model.visible ? A2($Html.ul,
       _U.list([$Html$Attributes.$class("completions")]),
       A2($List.indexedMap,A2(show,address,model.selection),visible)) : A2($Html.ul,_U.list([]),_U.list([]));
    });
    var moveSelection = F2(function (key,model) {
-      var fx = function () {
-         if (_U.cmp(key.x,0) > 0) {
-               var _p0 = A2(getAt,model.completions,model.selection);
-               if (_p0.ctor === "Just") {
-                     return $Effects.task($Task.succeed(Complete(_p0._0.command)));
-                  } else {
-                     return $Effects.none;
-                  }
-            } else return $Effects.none;
-      }();
       var potentialSelection = model.selection - key.y;
+      var visibleCompletions = A2($List.filter,completionMatch(model.command),model.completions);
       var newSelection = _U.cmp(potentialSelection,0) > -1 && _U.cmp(potentialSelection,
-      $List.length(model.completions)) < 0 ? potentialSelection : model.selection;
+      $List.length(visibleCompletions)) < 0 ? potentialSelection : model.selection;
+      var fx = function () {
+         var _p1 = A2(getAt,visibleCompletions,model.selection);
+         if (_p1.ctor === "Just") {
+               return $Effects.task($Task.succeed(Complete(_p1._0.command)));
+            } else {
+               return $Effects.none;
+            }
+      }();
       return {ctor: "_Tuple2",_0: _U.update(model,{selection: newSelection}),_1: fx};
    });
    var update = F2(function (action,model) {
-      var _p1 = action;
-      switch (_p1.ctor)
-      {case "StoreCompletions": var newModel = _U.update(model,{completions: A2($Maybe.withDefault,backupCompletions,_p1._0)});
+      var _p2 = action;
+      switch (_p2.ctor)
+      {case "StoreCompletions": var newModel = _U.update(model,{completions: A2($Maybe.withDefault,backupCompletions,_p2._0)});
            return {ctor: "_Tuple2",_0: newModel,_1: $Effects.none};
-         case "ArrowPress": return A2(moveSelection,_p1._0,model);
+         case "ArrowPress": return A2(moveSelection,_p2._0,model);
          case "Complete": return {ctor: "_Tuple2",_0: model,_1: $Effects.none};
-         default: return {ctor: "_Tuple2",_0: _U.update(model,{visible: _p1._0}),_1: $Effects.none};}
+         default: return {ctor: "_Tuple2",_0: _U.update(model,{visible: _p2._0}),_1: $Effects.none};}
    });
    var ArrowPress = function (a) {    return {ctor: "ArrowPress",_0: a};};
    var StoreCompletions = function (a) {    return {ctor: "StoreCompletions",_0: a};};
@@ -11527,12 +11536,17 @@ Elm.Input.make = function (_elm) {
    $Signal = Elm.Signal.make(_elm),
    $Task = Elm.Task.make(_elm);
    var _op = {};
+   var storeCommand = F2(function (command,model) {
+      var completions = model.completions;
+      var newCompletions = _U.update(completions,{command: command});
+      return _U.update(model,{command: command,completions: newCompletions});
+   });
    var StoreVal = function (a) {    return {ctor: "StoreVal",_0: a};};
    var AutoComplete = function (a) {    return {ctor: "AutoComplete",_0: a};};
    var update = F2(function (action,model) {
       var _p0 = action;
       switch (_p0.ctor)
-      {case "StoreVal": return {ctor: "_Tuple2",_0: _U.update(model,{command: _p0._0}),_1: $Effects.none};
+      {case "StoreVal": return {ctor: "_Tuple2",_0: A2(storeCommand,_p0._0,model),_1: $Effects.none};
          case "Completions": return {ctor: "_Tuple2",_0: model,_1: A2($Effects.map,AutoComplete,$AutoComplete.fetch("default"))};
          case "AutoComplete": var _p3 = _p0._0;
            var _p1 = _p3;
@@ -11563,7 +11577,7 @@ Elm.Input.make = function (_elm) {
                       ,A2($Html$Events.onKeyPress,address,handleKeyPress(model))
                       ,A3($Html$Events.on,"input",$Html$Events.targetValue,function (val) {    return A2($Signal.message,address,StoreVal(val));})]),
               _U.list([]))
-              ,A3($AutoComplete.view,A2($Signal.forwardTo,address,AutoComplete),model.command,model.completions)]));
+              ,A2($AutoComplete.view,A2($Signal.forwardTo,address,AutoComplete),model.completions)]));
    });
    var Model = F2(function (a,b) {    return {command: a,completions: b};});
    var init = {ctor: "_Tuple2",_0: A2(Model,"",$AutoComplete.init),_1: A2($Effects.map,AutoComplete,$AutoComplete.fetch("default"))};
@@ -11575,6 +11589,7 @@ Elm.Input.make = function (_elm) {
                               ,AutoComplete: AutoComplete
                               ,StoreVal: StoreVal
                               ,init: init
+                              ,storeCommand: storeCommand
                               ,update: update
                               ,sendCard: sendCard
                               ,view: view

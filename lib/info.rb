@@ -25,7 +25,7 @@ class Info
   end
 
   def weather
-    forecast
+    forecast || {}
   end
 
   private
