@@ -8,8 +8,16 @@ class Info
     tokens.first.downcase
   end
 
+  def has_contents?
+    tokens.size > 1
+  end
+
   def contents
-    tokens.drop(1).join(' ')
+    args.join(' ').strip
+  end
+
+  def args
+    tokens.drop(1)
   end
 
   def ip

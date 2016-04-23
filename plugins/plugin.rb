@@ -1,5 +1,23 @@
 module Plugins
   class Plugin
+    include Mote::Helpers
+
+    def response
+      Message.new(title: title, body: body)
+    end
+
+    def body
+      mote("./plugins/#{title}/#{title}.mote", contents)
+    end
+
+    def help
+      Message.new(title: "help #{title}", body: mote("./plugins/#{title}/help.mote"))
+    end
+
+    def contents
+      {}
+    end
+
     class << self
       def keyword(keyword, info: '')
         keywords[keyword] = [self, info]

@@ -17,7 +17,7 @@ RSpec.describe Plugins::Movie do
         ]
       end
 
-      expect(subject.title).to eq('Deadpool')
+      expect(subject.title).to eq('movie')
       expect(subject.body).to include('asdf.jpg')
       expect(subject.body).to include('2016-02-09')
       expect(subject.body).to include('7.18')

@@ -1,4 +1,5 @@
 require_relative 'spec_helper'
+include Mote::Helpers
 
 scope do
   test 'home' do
@@ -9,7 +10,9 @@ scope do
   test 'help' do
     get '/?q=help'
     assert_equal 200, last_response.status
-    assert_equal JSON.parse(last_response.body), 'title' => 'Help', 'body' => Plugins::Help::HELP_MESSAGE
+    assert_equal JSON.parse(last_response.body),
+      'title' => 'Help help',
+      'body' => mote("./plugins/help/help.mote", {})
   end
 
   test 'comp' do

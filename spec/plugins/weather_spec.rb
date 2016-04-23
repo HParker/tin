@@ -16,7 +16,7 @@ RSpec.describe Plugins::Ip do
 
     it 'returns the weather' do
       message = subject.response
-      expect(message.title).to eq('Clear')
+      expect(message.title).to eq('weather')
       expect(message.body).to match('test temp')
       expect(message.body).to match('test humidity')
     end
