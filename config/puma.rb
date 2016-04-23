@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 workers_count = Integer(ENV['PUMA_WORKERS'] || 2)
 threads_count = Integer(ENV['PUMA_THREADS'] || 5)
 

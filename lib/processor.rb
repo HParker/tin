@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 class Processor
   class << self
     def process(text, req)

@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Plugins
   class Plugin
     include Mote::Helpers

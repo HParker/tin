@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 $VERBOSE = !!ENV['VERBOSE']
 
 ENV['RACK_ENV'] = 'test'

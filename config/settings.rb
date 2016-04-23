@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'envoker'
 require 'rollbar'
 require 'forecast_io'

@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 class Message
   attr_reader :title, :body
 
