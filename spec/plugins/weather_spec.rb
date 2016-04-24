@@ -6,11 +6,10 @@ RSpec.describe Plugins::Ip do
     let(:info) do
       test_double = double('weather')
       allow(test_double).to receive(:weather).and_return(
-        currently: {
-          summary: 'Clear',
-          apparentTemperature: 'test temp',
-          humidity: 'test humidity'
-        })
+        OpenStruct.new(
+          currently: OpenStruct.new(summary: 'Clear',
+                                    apparentTemperature: 'test temp',
+                                    humidity: 'test humidity')))
       test_double
     end
     subject { Plugins::Weather.new(info) }

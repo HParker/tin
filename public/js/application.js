@@ -11417,28 +11417,44 @@ Elm.Card.make = function (_elm) {
                                                                                                                           ,_0: model
                                                                                                                           ,_1: $Effects.none};
          case "Move": return {ctor: "_Tuple2",_0: model,_1: $Effects.none};
+         case "Delete": return {ctor: "_Tuple2",_0: model,_1: $Effects.none};
          default: return {ctor: "_Tuple2",_0: model,_1: $Effects.none};}
    });
    var collapse = function (model) {    return _U.update(model,{collapsed: true});};
+   var Delete = function (a) {    return {ctor: "Delete",_0: a};};
    var Move = function (a) {    return {ctor: "Move",_0: a};};
    var Collapse = function (a) {    return {ctor: "Collapse",_0: a};};
    var view = F2(function (address,card) {
-      var _p1 = card.collapsed ? {ctor: "_Tuple2",_0: "",_1: "icon octicon octicon-chevron-up"} : {ctor: "_Tuple2"
-                                                                                                  ,_0: card.body
-                                                                                                  ,_1: "icon octicon octicon-chevron-down"};
+      var _p1 = card.collapsed ? {ctor: "_Tuple2",_0: "",_1: "card-icon icon octicon octicon-chevron-up"} : {ctor: "_Tuple2"
+                                                                                                            ,_0: card.body
+                                                                                                            ,_1: "card-icon icon octicon octicon-chevron-down"};
       var cardBody = _p1._0;
       var collapseIcon = _p1._1;
       return A2($Html.div,
       _U.list([$Html$Attributes.$class("card")]),
       _U.list([A2($Html.span,_U.list([$Html$Attributes.$class("title")]),_U.list([$Html.text(card.title)]))
-              ,A2($Html.span,_U.list([$Html$Attributes.$class("icon octicon octicon-pin"),A2($Html$Events.onClick,address,Move(card.id))]),_U.list([]))
+              ,A2($Html.span,
+              _U.list([$Html$Attributes.$class("card-icon icon octicon octicon-x"),A2($Html$Events.onClick,address,Delete(card.id))]),
+              _U.list([]))
+              ,A2($Html.span,
+              _U.list([$Html$Attributes.$class("card-icon icon octicon octicon-pin"),A2($Html$Events.onClick,address,Move(card.id))]),
+              _U.list([]))
               ,A2($Html.span,_U.list([$Html$Attributes.$class(collapseIcon),A2($Html$Events.onClick,address,Collapse(card.id))]),_U.list([]))
               ,$Markdown.toHtml(cardBody)]));
    });
    var NoOp = {ctor: "NoOp"};
    var Model = F4(function (a,b,c,d) {    return {title: a,body: b,id: c,collapsed: d};});
    var build = F3(function (title,body,id) {    return A4(Model,title,body,id,false);});
-   return _elm.Card.values = {_op: _op,Model: Model,NoOp: NoOp,Collapse: Collapse,Move: Move,build: build,collapse: collapse,update: update,view: view};
+   return _elm.Card.values = {_op: _op
+                             ,Model: Model
+                             ,NoOp: NoOp
+                             ,Collapse: Collapse
+                             ,Move: Move
+                             ,Delete: Delete
+                             ,build: build
+                             ,collapse: collapse
+                             ,update: update
+                             ,view: view};
 };
 Elm.Cards = Elm.Cards || {};
 Elm.Cards.make = function (_elm) {
@@ -11464,6 +11480,7 @@ Elm.Cards.make = function (_elm) {
    A2($Json$Decode._op[":="],"title",$Json$Decode.string),
    A2($Json$Decode._op[":="],"body",$Json$Decode.string));
    var addCards = F2(function (newCards,model) {    return _U.update(model,{cards: A2($Basics._op["++"],model.cards,newCards)});});
+   var add = F2(function (card,model) {    return _U.update(model,{cards: A2($List._op["::"],card,model.cards),nextID: model.nextID + 1});});
    var Move = function (a) {    return {ctor: "Move",_0: a};};
    var Card = function (a) {    return {ctor: "Card",_0: a};};
    var view = F2(function (address,model) {    return A2($Html.div,_U.list([]),A2($List.map,$Card.view(A2($Signal.forwardTo,address,Card)),model.cards));});
@@ -11484,18 +11501,18 @@ Elm.Cards.make = function (_elm) {
            return {ctor: "_Tuple2",_0: _U.update(model,{cards: newCards,nextID: model.nextID + 1}),_1: $Effects.none};
          case "Card": var _p5 = _p0._0;
            var _p2 = _p5;
-           if (_p2.ctor === "Move") {
-                 var _p3 = _p2._0;
-                 var movingCards = A2($List.map,$Card.collapse,A2($List.filter,function (c) {    return _U.eq(c.id,_p3);},model.cards));
-                 var fx = $Effects.task($Task.succeed(Move(movingCards)));
-                 var newCards = A2($List.filter,function (c) {    return !_U.eq(c.id,_p3);},model.cards);
-                 return {ctor: "_Tuple2",_0: _U.update(model,{cards: newCards}),_1: fx};
-              } else {
-                 var _p4 = $List.unzip(A2($List.map,$Card.update(_p5),model.cards));
-                 var newCards = _p4._0;
-                 var fxs = _p4._1;
-                 return {ctor: "_Tuple2",_0: _U.update(model,{cards: newCards}),_1: A2($Effects.map,Card,$Effects.batch(fxs))};
-              }
+           switch (_p2.ctor)
+           {case "Delete": var newCards = A2($List.filter,function (c) {    return !_U.eq(c.id,_p2._0);},model.cards);
+                return {ctor: "_Tuple2",_0: _U.update(model,{cards: newCards}),_1: $Effects.none};
+              case "Move": var _p3 = _p2._0;
+                var movingCards = A2($List.filter,function (c) {    return _U.eq(c.id,_p3);},model.cards);
+                var fx = $Effects.task($Task.succeed(Move(movingCards)));
+                var newCards = A2($List.filter,function (c) {    return !_U.eq(c.id,_p3);},model.cards);
+                return {ctor: "_Tuple2",_0: _U.update(model,{cards: newCards}),_1: fx};
+              default: var _p4 = $List.unzip(A2($List.map,$Card.update(_p5),model.cards));
+                var newCards = _p4._0;
+                var fxs = _p4._1;
+                return {ctor: "_Tuple2",_0: _U.update(model,{cards: newCards}),_1: A2($Effects.map,Card,$Effects.batch(fxs))};}
          case "Move": return {ctor: "_Tuple2",_0: model,_1: $Effects.none};
          default: return {ctor: "_Tuple2",_0: model,_1: $Effects.none};}
    });
@@ -11511,6 +11528,7 @@ Elm.Cards.make = function (_elm) {
                               ,Card: Card
                               ,Move: Move
                               ,init: init
+                              ,add: add
                               ,view: view
                               ,addCards: addCards
                               ,update: update
@@ -11568,7 +11586,7 @@ Elm.Input.make = function (_elm) {
    var handleKeyPress = F2(function (model,code) {    return _U.eq(code,13) ? Request(model.command) : NoOp;});
    var view = F2(function (address,model) {
       return A2($Html.div,
-      _U.list([$Html$Attributes.id("app")]),
+      _U.list([$Html$Attributes.id("main-interface")]),
       _U.list([A2($Html.input,
               _U.list([$Html$Attributes.placeholder("Hello")
                       ,$Html$Attributes.value(model.command)
@@ -11603,6 +11621,7 @@ Elm.Main.make = function (_elm) {
    var _U = Elm.Native.Utils.make(_elm),
    $AutoComplete = Elm.AutoComplete.make(_elm),
    $Basics = Elm.Basics.make(_elm),
+   $Card = Elm.Card.make(_elm),
    $Cards = Elm.Cards.make(_elm),
    $Debug = Elm.Debug.make(_elm),
    $Effects = Elm.Effects.make(_elm),
@@ -11617,63 +11636,81 @@ Elm.Main.make = function (_elm) {
    $StartApp = Elm.StartApp.make(_elm),
    $Task = Elm.Task.make(_elm);
    var _op = {};
+   var History = function (a) {    return {ctor: "History",_0: a};};
    var Pins = function (a) {    return {ctor: "Pins",_0: a};};
    var Cards = function (a) {    return {ctor: "Cards",_0: a};};
    var Input = function (a) {    return {ctor: "Input",_0: a};};
    var update = F2(function (action,model) {
       var _p0 = action;
       switch (_p0.ctor)
-      {case "Input": var _p4 = _p0._0;
-           var _p1 = _p4;
+      {case "Input": var _p5 = _p0._0;
+           var _p1 = _p5;
            if (_p1.ctor === "Request") {
-                 var _p2 = A2($Cards.update,$Cards.Get(_p1._0),model.cards);
+                 var _p3 = _p1._0;
+                 var _p2 = A2($Cards.update,$Cards.Get(_p3),model.cards);
                  var cards = _p2._0;
                  var fx = _p2._1;
-                 var input = model.input;
-                 var newInput = _U.update(input,{command: ""});
-                 return {ctor: "_Tuple2",_0: _U.update(model,{input: newInput,cards: cards}),_1: A2($Effects.map,Cards,fx)};
+                 var newHistories = A2($Cards.add,A3($Card.build,"History",_p3,model.histories.nextID),model.histories);
+                 var newInput = A2($Input.storeCommand,"",model.input);
+                 return {ctor: "_Tuple2",_0: _U.update(model,{input: newInput,cards: cards,histories: newHistories}),_1: A2($Effects.map,Cards,fx)};
               } else {
-                 var _p3 = A2($Input.update,_p4,model.input);
-                 var input = _p3._0;
-                 var fx = _p3._1;
+                 var _p4 = A2($Input.update,_p5,model.input);
+                 var input = _p4._0;
+                 var fx = _p4._1;
                  return {ctor: "_Tuple2",_0: _U.update(model,{input: input}),_1: A2($Effects.map,Input,fx)};
               }
-         case "Cards": var _p7 = _p0._0;
-           var _p5 = _p7;
-           if (_p5.ctor === "Move") {
-                 return {ctor: "_Tuple2",_0: _U.update(model,{pins: A2($Cards.addCards,_p5._0,model.pins)}),_1: $Effects.none};
+         case "Cards": var _p8 = _p0._0;
+           var _p6 = _p8;
+           if (_p6.ctor === "Move") {
+                 return {ctor: "_Tuple2",_0: _U.update(model,{pins: A2($Cards.addCards,_p6._0,model.pins)}),_1: $Effects.none};
               } else {
-                 var _p6 = A2($Cards.update,_p7,model.cards);
-                 var cards = _p6._0;
-                 var fx = _p6._1;
+                 var _p7 = A2($Cards.update,_p8,model.cards);
+                 var cards = _p7._0;
+                 var fx = _p7._1;
                  return {ctor: "_Tuple2",_0: _U.update(model,{cards: cards}),_1: A2($Effects.map,Cards,fx)};
               }
-         default: var _p10 = _p0._0;
-           var _p8 = _p10;
-           if (_p8.ctor === "Move") {
-                 return {ctor: "_Tuple2",_0: _U.update(model,{cards: A2($Cards.addCards,_p8._0,model.cards)}),_1: $Effects.none};
+         case "Pins": var _p11 = _p0._0;
+           var _p9 = _p11;
+           if (_p9.ctor === "Move") {
+                 return {ctor: "_Tuple2",_0: _U.update(model,{cards: A2($Cards.addCards,_p9._0,model.cards)}),_1: $Effects.none};
               } else {
-                 var _p9 = A2($Cards.update,_p10,model.pins);
-                 var cards = _p9._0;
-                 var fx = _p9._1;
+                 var _p10 = A2($Cards.update,_p11,model.pins);
+                 var cards = _p10._0;
+                 var fx = _p10._1;
                  return {ctor: "_Tuple2",_0: _U.update(model,{pins: cards}),_1: A2($Effects.map,Pins,fx)};
-              }}
+              }
+         default: var _p12 = A2($Cards.update,_p0._0,model.pins);
+           var cards = _p12._0;
+           var fx = _p12._1;
+           return {ctor: "_Tuple2",_0: _U.update(model,{histories: cards}),_1: A2($Effects.map,History,fx)};}
    });
    var view = F2(function (address,model) {
       return A2($Html.div,
       _U.list([$Html$Attributes.$class("center")]),
-      _U.list([A2($Input.view,A2($Signal.forwardTo,address,Input),model.input)
-              ,A2($Html.div,_U.list([$Html$Attributes.$class("pins")]),_U.list([A2($Cards.view,A2($Signal.forwardTo,address,Pins),model.pins)]))
-              ,A2($Cards.view,A2($Signal.forwardTo,address,Cards),model.cards)]));
+      _U.list([A2($Html.div,
+              _U.list([$Html$Attributes.$class("left")]),
+              _U.list([A2($Html.span,_U.list([$Html$Attributes.$class("header-icon icon mega-octicon octicon-book")]),_U.list([]))
+                      ,A2($Html.div,
+                      _U.list([$Html$Attributes.$class("contents histories")]),
+                      _U.list([A2($Cards.view,A2($Signal.forwardTo,address,History),model.histories)]))]))
+              ,A2($Html.div,
+              _U.list([$Html$Attributes.$class("right")]),
+              _U.list([A2($Html.span,_U.list([$Html$Attributes.$class("header-icon icon mega-octicon octicon-pin")]),_U.list([]))
+                      ,A2($Html.div,
+                      _U.list([$Html$Attributes.$class("contents pins")]),
+                      _U.list([A2($Cards.view,A2($Signal.forwardTo,address,Pins),model.pins)]))]))
+              ,A2($Html.div,
+              _U.list([$Html$Attributes.id("app")]),
+              _U.list([A2($Input.view,A2($Signal.forwardTo,address,Input),model.input),A2($Cards.view,A2($Signal.forwardTo,address,Cards),model.cards)]))]));
    });
-   var arrowPressAutoCompleteInput = function (_p11) {    return Input($Input.AutoComplete($AutoComplete.ArrowPress(_p11)));};
+   var arrowPressAutoCompleteInput = function (_p13) {    return Input($Input.AutoComplete($AutoComplete.ArrowPress(_p13)));};
    var keyboardInputs = A2($Signal.map,arrowPressAutoCompleteInput,$Keyboard.arrows);
-   var Model = F3(function (a,b,c) {    return {input: a,cards: b,pins: c};});
+   var Model = F4(function (a,b,c,d) {    return {input: a,cards: b,pins: c,histories: d};});
    var init = function () {
-      var _p12 = $Input.init;
-      var input = _p12._0;
-      var fx = _p12._1;
-      return {ctor: "_Tuple2",_0: A3(Model,input,$Cards.init,$Cards.init),_1: A2($Effects.map,Input,fx)};
+      var _p14 = $Input.init;
+      var input = _p14._0;
+      var fx = _p14._1;
+      return {ctor: "_Tuple2",_0: A4(Model,input,$Cards.init,$Cards.init,$Cards.init),_1: A2($Effects.map,Input,fx)};
    }();
    var app = $StartApp.start({init: init,view: view,update: update,inputs: _U.list([keyboardInputs])});
    var tasks = Elm.Native.Task.make(_elm).performSignal("tasks",app.tasks);
@@ -11683,6 +11720,7 @@ Elm.Main.make = function (_elm) {
                              ,Input: Input
                              ,Cards: Cards
                              ,Pins: Pins
+                             ,History: History
                              ,init: init
                              ,update: update
                              ,view: view

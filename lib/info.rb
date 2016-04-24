@@ -34,13 +34,13 @@ class Info
   end
 
   def weather
-    forecast || {}
+    forecast
   end
 
   private
 
   def forecast
-    ForecastIO.forecast(db.location.latitude, db.location.longitude)
+    @forecart ||= ForecastIO.forecast(db.location.latitude, db.location.longitude)
   end
 
   def tokens

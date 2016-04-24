@@ -16,11 +16,19 @@ module Plugins
     end
 
     def contents
-      {
-       summary: @info.weather.dig(:currently, :summary),
-       temperature: @info.weather.dig(:currently, :apparentTemperature),
-       humidity: @info.weather.dig(:currently, :humidity)
-      }
+      if @info.weather
+        {
+          summary: @info.weather.currently.summary,
+          temperature: @info.weather.currently.apparentTemperature,
+          humidity: @info.weather.currently.humidity
+        }
+      else
+        {
+          summary: 'unknown',
+          temperature: 'n/a',
+          humidity: 'n/a'
+        }
+      end
     end
   end
 end

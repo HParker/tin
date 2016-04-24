@@ -5,7 +5,7 @@ module Plugins
   class Help < Plugin
     KEYWORD = 'help'
 
-    keyword KEYWORD, info: "show info about Tin"
+    keyword KEYWORD, info: "[command] show info about Tin"
 
     def title
       KEYWORD
