@@ -11650,7 +11650,7 @@ Elm.Main.make = function (_elm) {
                  var _p2 = A2($Cards.update,$Cards.Get(_p3),model.cards);
                  var cards = _p2._0;
                  var fx = _p2._1;
-                 var newHistories = A2($Cards.add,A3($Card.build,"History",_p3,model.histories.nextID),model.histories);
+                 var newHistories = A2($Cards.add,A3($Card.build,"",_p3,model.histories.nextID),model.histories);
                  var newInput = A2($Input.storeCommand,"",model.input);
                  return {ctor: "_Tuple2",_0: _U.update(model,{input: newInput,cards: cards,histories: newHistories}),_1: A2($Effects.map,Cards,fx)};
               } else {
