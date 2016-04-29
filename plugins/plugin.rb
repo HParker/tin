@@ -4,7 +4,11 @@ module Plugins
     include Mote::Helpers
 
     def response
-      Message.new(title: title, body: body)
+      Message.new(title: title,
+                  body: body,
+                  refresh_rate: refresh_rate,
+                  refresh_url: refresh_url
+                 )
     end
 
     def body
@@ -12,11 +16,23 @@ module Plugins
     end
 
     def help
-      Message.new(title: "help #{title}", body: mote("./plugins/#{title}/help.mote"))
+      Message.new(title: "help #{title}",
+                  body: mote("./plugins/#{title}/help.mote"),
+                  refresh_rate: refresh_rate,
+                  refresh_url: refresh_url
+                 )
     end
 
     def contents
       {}
+    end
+
+    def refresh_rate
+      0
+    end
+
+    def refresh_url
+      ""
     end
 
     class << self

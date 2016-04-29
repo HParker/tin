@@ -13,7 +13,9 @@ scope do
     assert_equal 200, last_response.status
     assert_equal JSON.parse(last_response.body),
       'title' => 'Help help',
-      'body' => mote("./plugins/help/help.mote", {})
+      'body' => mote('./plugins/help/help.mote', {}),
+      'refresh_rate' => 0,
+      'refresh_url' => ''
   end
 
   test 'comp' do
